@@ -90,11 +90,38 @@ fn path_str(repo_dir: &PathBuf) -> io::Result<String> {
 /// Syncs the filesystem to disk to ensure consistent tests
 #[cfg(not(windows))]
 fn fs_sync() {
+    #[cfg(any(
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "linux",
+        target_os = "netbsd",
+        target_os = "openbsd"
+    ))]
+    nix::unistd::sync();
+
+    #[cfg(not(any(
+        target_os = "dragonfly",
+        target_os = "freebsd",
+        target_os = "linux",
+        target_os = "netbsd",
+        target_os = "openbsd"
+    )))]
     Command::new("sync").status().unwrap();
 }
 
 #[cfg(windows)]
-fn fs_sync() {}
+fn fs_sync() {
+    use std::os::windows::prelude::*;
+    use winapi::um::errhandlingapi::GetLastError;
+    use winapi::um::fileapi::FlushFileBuffers;
+
+    let handle = std::fs::OpenOptions::new().write(true).open("C:").unwrap();
+
+    let r = unsafe { FlushFileBuffers(handle.as_raw_handle()) };
+    if r == 0 {
+        panic!("Failed to flush dir, {}", unsafe { GetLastError() });
+    }
+}
 
 /// Extends `std::process::Command` with methods for testing
 pub trait TestCommand {
