@@ -115,7 +115,7 @@ fn fs_sync() {
     use winapi::um::errhandlingapi::GetLastError;
     use winapi::um::fileapi::FlushFileBuffers;
 
-    let handle = std::fs::OpenOptions::new().write(true).open("C:").unwrap();
+    let handle = std::fs::OpenOptions::new().write(true).open("D:").unwrap();
 
     let r = unsafe { FlushFileBuffers(handle.as_raw_handle()) };
     if r == 0 {
