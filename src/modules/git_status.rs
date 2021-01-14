@@ -35,7 +35,7 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
 
     if let Some(git_status) = git_status_wsl(context, &config) {
         if git_status.is_empty() {
-            return None
+            return None;
         }
         module.set_segments(vec![Segment::new(None, git_status)]);
         return Some(module);
