@@ -368,7 +368,7 @@ fn git_status_wsl(context: &Context, conf: &GitStatusConfig) -> Option<String> {
         }
     };
 
-    log::trace!("Windows path:\n{}", winpath);
+    log::trace!("Windows path: {}", winpath);
 
     // In Windows or Linux dir?
     if winpath.starts_with(r"\\wsl") {
