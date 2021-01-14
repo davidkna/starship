@@ -33,6 +33,14 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
     let mut module = context.new_module("git_status");
     let config: GitStatusConfig = GitStatusConfig::try_load(module.config);
 
+    if let Some(git_status) = git_status_wsl(context, &config) {
+        if git_status.is_empty() {
+            return None
+        }
+        module.set_segments(vec![Segment::new(None, git_status)]);
+        return Some(module);
+    }
+
     let parsed = StringFormatter::new(config.format).and_then(|formatter| {
         formatter
             .map_meta(|variable, _| match variable {
@@ -312,6 +320,98 @@ fn format_count(format_str: &str, config_path: &str, count: usize) -> Option<Vec
         "count" => Some(count.to_string()),
         _ => None,
     })
+}
+
+#[cfg(target_os = "linux")]
+fn git_status_wsl(context: &Context, conf: &GitStatusConfig) -> Option<String> {
+    use nix::sys::utsname::uname;
+    use std::env;
+    use std::io::ErrorKind;
+    use std::process::Command;
+
+    let starship_exe = conf.windows_starship?;
+
+    // Ensure this is WSL
+    if !uname().release().contains("microsoft") {
+        return None;
+    }
+
+    log::trace!("Using WSL mode");
+
+    // Get Windows path
+    let winpath = match Command::new("wslpath")
+        .arg("-w")
+        .arg(&context.current_dir)
+        .output()
+    {
+        Ok(r) => r,
+        Err(e) => {
+            // Not found might means this might not be WSL after all
+            let level = if e.kind() == ErrorKind::NotFound {
+                log::Level::Debug
+            } else {
+                log::Level::Error
+            };
+
+            log::log!(level, "Failed to get Windows path:\n{:?}", e);
+
+            return None;
+        }
+    };
+
+    let winpath = match std::str::from_utf8(&winpath.stdout) {
+        Ok(r) => r.trim_end(),
+        Err(e) => {
+            log::error!("Failed to parse Windows path:\n{:?}", e);
+
+            return None;
+        }
+    };
+
+    log::trace!("Windows path:\n{}", winpath);
+
+    // In Windows or Linux dir?
+    if winpath.starts_with(r"\\wsl") {
+        log::trace!("Not a Windows path");
+        return None;
+    }
+
+    // Get foreign starship to use WSL config
+    // https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows/
+    let wslenv = env::var("WSLENV")
+        .map(|e| e + ":STARSHIP_CONFIG/wp")
+        .unwrap_or_else(|_| "STARSHIP_CONFIG/wp".to_string());
+
+    let out = match Command::new(starship_exe)
+        .env("STARSHIP_CONFIG", crate::config::get_config_path()?)
+        .env("WSLENV", wslenv)
+        .args(&["module", "git_status", "--path", winpath])
+        .output()
+    {
+        Ok(r) => r,
+        Err(e) => {
+            log::error!("Failed to run Git Status module on Windows:\n{}", e);
+
+            return None;
+        }
+    };
+
+    match String::from_utf8(out.stdout) {
+        Ok(r) => Some(r),
+        Err(e) => {
+            log::error!(
+                "Failed to parse Windows Git Status module status output:\n{}",
+                e
+            );
+
+            None
+        }
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+fn git_status_wsl(_context: &Context, _conf: &GitStatusConfig) -> Option<String> {
+    None
 }
 
 #[cfg(test)]

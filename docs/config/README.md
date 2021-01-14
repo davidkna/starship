@@ -1236,6 +1236,13 @@ cherry_pick = "[🍒 PICKING](bold red)"
 The `git_status` module shows symbols representing the state of the repo in your
 current directory.
 
+::: tip
+
+The Git Status module is very slow in Windows directories (anything in `/mnt/c/`) when in a WSL environment.
+You can disable the module or use the `windows_starship` option to use a Windows-native Starship executable to compute `git_status` for those paths.
+
+:::
+
 ### Options
 
 | Option       | Default                                       | Description                         |
@@ -1253,6 +1260,7 @@ current directory.
 | `deleted`    | `"✘"`                                         | The format of `deleted`             |
 | `style`      | `"bold red"`                                  | The style for the module.           |
 | `disabled`   | `false`                                       | Disables the `git_status` module.   |
+| `windows_starship` || Use this (Linux) path to a Windows Starship executable to render `git_status` when on Windows paths in WSL. |
 
 ### Variables
 
@@ -1313,6 +1321,15 @@ Show ahead/behind count of the branch being tracked
 ahead = "⇡${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 behind = "⇣${count}"
+```
+
+Use Windows Starship executable on Windows paths in WSL
+
+```toml
+# ~/.config/starship.toml
+
+[git_status]
+windows_starship = '/mnt/c/Users/username/scoop/apps/starship/current/starship.exe'
 ```
 
 ## Golang
