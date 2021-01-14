@@ -332,7 +332,8 @@ fn git_status_wsl(context: &Context, conf: &GitStatusConfig) -> Option<String> {
     let starship_exe = conf.windows_starship?;
 
     // Ensure this is WSL
-    if !uname().release().contains("microsoft") {
+    // This is lowercase in WSL1 and uppercase in WSL2, just skip the first letter
+    if !uname().release().contains("icrosoft") {
         return None;
     }
 
