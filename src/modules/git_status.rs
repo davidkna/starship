@@ -384,7 +384,10 @@ fn git_status_wsl(context: &Context, conf: &GitStatusConfig) -> Option<String> {
         .unwrap_or_else(|_| "STARSHIP_CONFIG/wp".to_string());
 
     let out = match Command::new(starship_exe)
-        .env("STARSHIP_CONFIG", crate::config::get_config_path()?)
+        .env(
+            "STARSHIP_CONFIG",
+            crate::config::get_config_path().unwrap_or_else("/dev/null"),
+        )
         .env("WSLENV", wslenv)
         .args(&["module", "git_status", "--path", winpath])
         .output()
