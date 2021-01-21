@@ -197,6 +197,24 @@ where
     }
 }
 
+#[derive(Clone)]
+pub enum Either<A, B> {
+    First(A),
+    Second(B),
+}
+
+impl<'a, A, B> ModuleConfig<'a> for Either<A, B>
+where
+    A: ModuleConfig<'a> + Sized,
+    B: ModuleConfig<'a> + Sized,
+{
+    fn from_config(config: &'a Value) -> Option<Self> {
+        A::from_config(config)
+            .map(Either::First)
+            .or_else(|| B::from_config(config).map(Either::Second))
+    }
+}
+
 /// Root config of starship.
 pub struct StarshipConfig {
     pub config: Option<Value>,

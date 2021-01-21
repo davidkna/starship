@@ -4,7 +4,7 @@ use std::time::Instant;
 
 use super::{Context, Module, RootModuleConfig};
 
-use crate::{configs::custom::CustomConfig, formatter::StringFormatter};
+use crate::{config::Either, configs::custom::CustomConfig, formatter::StringFormatter};
 
 /// Creates a custom module with some configuration
 ///
@@ -35,9 +35,10 @@ pub fn module<'a>(name: &str, context: &'a Context) -> Option<Module<'a>> {
     let mut is_match = scan_dir.is_match();
 
     if !is_match {
-        if let Some(when) = config.when {
-            is_match = exec_when(when, &config.shell.0);
-        }
+        is_match = match config.when {
+            Either::First(b) => b,
+            Either::Second(s) => exec_when(s, &config.shell.0),
+        };
 
         if !is_match {
             return None;
@@ -244,6 +245,8 @@ fn handle_powershell(command: &mut Command, shell: &str, shell_args: &[&str]) {
 
 #[cfg(test)]
 mod tests {
+    use crate::test::ModuleRenderer;
+
     use super::*;
 
     #[cfg(not(windows))]
@@ -319,5 +322,84 @@ mod tests {
     fn command_can_fail() {
         assert_eq!(exec_command(FAILING_COMMAND, SHELL), None);
         assert_eq!(exec_command(UNKNOWN_COMMAND, SHELL), None);
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn when_true_with_string() -> std::io::Result<()> {
+        let dir = tempfile::tempdir()?;
+
+        let actual = ModuleRenderer::new("custom.test")
+            .path(dir.path())
+            .config(toml::toml! {
+                [custom.test]
+                format = "test"
+                shell = ["sh"]
+                when = "true"
+            })
+            .collect();
+        let expected = Some("test".to_string());
+        assert_eq!(expected, actual);
+
+        dir.close()
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn when_false_with_string() -> std::io::Result<()> {
+        let dir = tempfile::tempdir()?;
+
+        let actual = ModuleRenderer::new("custom.test")
+            .path(dir.path())
+            .config(toml::toml! {
+                [custom.test]
+                format = "test"
+                shell = ["sh"]
+                when = "false"
+            })
+            .collect();
+        let expected = None;
+        assert_eq!(expected, actual);
+
+        dir.close()
+    }
+
+    #[test]
+    fn when_true_with_bool() -> std::io::Result<()> {
+        let dir = tempfile::tempdir()?;
+
+        let actual = ModuleRenderer::new("custom.test")
+            .path(dir.path())
+            .config(toml::toml! {
+                [custom.test]
+                format = "test"
+                shell = ["sh"]
+                when = true
+            })
+            .collect();
+        let expected = Some("test".to_string());
+        assert_eq!(expected, actual);
+
+        dir.close()
+    }
+
+    #[test]
+    #[cfg(not(windows))]
+    fn when_false_with_bool() -> std::io::Result<()> {
+        let dir = tempfile::tempdir()?;
+
+        let actual = ModuleRenderer::new("custom.test")
+            .path(dir.path())
+            .config(toml::toml! {
+                [custom.test]
+                format = "test"
+                shell = ["sh"]
+                when = false
+            })
+            .collect();
+        let expected = None;
+        assert_eq!(expected, actual);
+
+        dir.close()
     }
 }
