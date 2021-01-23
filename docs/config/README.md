@@ -2561,7 +2561,7 @@ If you have an interesting example not covered there, feel free to share it ther
 | Option        | Default                       | Description                                                                                                                |
 | ------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `command`     |                                 | The command whose output should be printed. The command will be passed on stdin to the shell.                              |
-| `when`        | `false`                         | Either a boolean value (`true` or `false`) or a string shell command used as a condition to show the module. In case of a string, the module will be shown if the command returns a `0` status code. |
+| `when`        | `false`                         | Either a boolean value (`true` or `false`, without quotes) or a string shell command used as a condition to show the module. In case of a string, the module will be shown if the command returns a `0` status code. |
 | `shell`       |                                 | [See below](#custom-command-shell)                                                                                         |
 | `description` | `"<custom module>"`             | The description of the module that is shown when running `starship explain`.                                               |
 | `files`       | `[]`                            | The files that will be searched in the working directory for a match.                                                      |
