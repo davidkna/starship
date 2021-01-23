@@ -1596,6 +1596,12 @@ To enable it, set `disabled` to `false` in your configuration file.
 
 :::
 
+::: warning
+
+This module is only supported on the Linux, macOS and Windows operating systems.
+
+:::
+
 ### Options
 
 | Option      | Default                | Description                                              |
