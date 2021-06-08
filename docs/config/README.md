@@ -1238,7 +1238,7 @@ current directory.
 
 ::: tip
 
-The Git Status module is very slow in Windows directories (anything in `/mnt/c/`) when in a WSL environment.
+The Git Status module is very slow in Windows directories (for example under `/mnt/c/`) when in a WSL environment.
 You can disable the module or use the `windows_starship` option to use a Windows-native Starship executable to compute `git_status` for those paths.
 
 :::
