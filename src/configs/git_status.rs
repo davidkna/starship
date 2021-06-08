@@ -18,7 +18,7 @@ pub struct GitStatusConfig<'a> {
     pub staged: &'a str,
     pub untracked: &'a str,
     pub disabled: bool,
-    #[cfg(target_os = "linux")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub windows_starship: Option<&'a str>,
 }
 
@@ -38,7 +38,6 @@ impl<'a> Default for GitStatusConfig<'a> {
             staged: "+",
             untracked: "?",
             disabled: false,
-            #[cfg(target_os = "linux")]
             windows_starship: None,
         }
     }
