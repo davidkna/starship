@@ -7,6 +7,7 @@ use std::time::SystemTime;
 use clap::{App, AppSettings, Arg, Shell, SubCommand};
 use rand::distributions::Alphanumeric;
 use rand::Rng;
+use starship::context::Target;
 use starship::module::ALL_MODULES;
 use starship::*;
 
@@ -108,9 +109,11 @@ fn main() {
                 SubCommand::with_name("prompt")
                     .about("Prints the full starship prompt")
                     .arg(
-                        Arg::with_name("right")
-                            .long("right")
-                            .help("Print the right prompt (instead of the standard left prompt)"),
+                        Arg::with_name("target")
+                            .long("target")
+                            .possible_values(&Target::variants())
+                            .default_value("Main")
+                            .help("Which type of prompt to render"),
                     )
                     .arg(&status_code_arg)
                     .arg(&pipestatus_arg)

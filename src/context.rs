@@ -5,7 +5,7 @@ use crate::utils::{create_command, exec_timeout, CommandOutput};
 
 use crate::modules;
 use crate::utils::{self, home_dir};
-use clap::ArgMatches;
+use clap::{arg_enum, value_t, ArgMatches};
 use git2::{ErrorCode::UnbornBranch, Repository, RepositoryState};
 use once_cell::sync::OnceCell;
 use std::collections::{HashMap, HashSet};
@@ -17,6 +17,16 @@ use std::path::{Path, PathBuf};
 use std::string::String;
 use std::time::{Duration, Instant};
 use terminal_size::terminal_size;
+
+arg_enum! {
+    // Switch to CamelCase in clap v3
+    #[allow(non_camel_case_types)]
+    #[derive(PartialEq, Debug)]
+    pub enum Target {
+        main,
+        right
+    }
+}
 
 /// Context contains data or common methods that may be used by multiple modules.
 /// The data contained within Context will be relevant to this particular rendering
@@ -48,8 +58,8 @@ pub struct Context<'a> {
     /// The shell the user is assumed to be running
     pub shell: Shell,
 
-    /// Construct the right prompt instead of the left prompt
-    pub right: bool,
+    /// Which prompt to print (main, right)
+    pub target: Target,
 
     /// Width of terminal, or zero if width cannot be detected.
     pub width: usize,
@@ -133,7 +143,7 @@ impl<'a> Context<'a> {
             .as_ref()
             .map_or_else(StarshipRootConfig::default, StarshipRootConfig::load);
 
-        let right = arguments.is_present("right");
+        let target = value_t!(arguments.value_of("target"), Target).unwrap_or(Target::main);
 
         let width = arguments
             .value_of("terminal_width")
@@ -150,7 +160,7 @@ impl<'a> Context<'a> {
             dir_contents: OnceCell::new(),
             repo: OnceCell::new(),
             shell,
-            right,
+            target,
             width,
             #[cfg(test)]
             env: HashMap::new(),

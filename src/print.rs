@@ -10,7 +10,7 @@ use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthChar;
 
 use crate::configs::PROMPT_ORDER;
-use crate::context::{Context, Shell};
+use crate::context::{Context, Shell, Target};
 use crate::formatter::{StringFormatter, VariableHolder};
 use crate::module::Module;
 use crate::module::ALL_MODULES;
@@ -119,7 +119,7 @@ pub fn get_prompt(context: Context) -> String {
     }
     write!(buf, "{}", ANSIStrings(&module_strings)).unwrap();
 
-    if context.right {
+    if context.target == Target::right {
         // right prompts generally do not allow newlines
         buf = buf.replace('\n', "");
     }
@@ -428,10 +428,9 @@ fn load_formatter_and_modules<'a>(context: &'a Context) -> (StringFormatter<'a>,
             let mut modules: BTreeSet<String> = BTreeSet::new();
             modules.extend(lf.get_variables());
             modules.extend(rf.get_variables());
-            if context.right {
-                (rf, modules)
-            } else {
-                (lf, modules)
+            match context.target {
+                Target::main => (lf, modules),
+                Target::right => (rf, modules),
             }
         }
         _ => (StringFormatter::raw(">"), BTreeSet::new()),
