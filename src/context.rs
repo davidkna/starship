@@ -100,13 +100,27 @@ impl<'a> Context<'a> {
 
     /// Create a new instance of Context for the provided directory
     pub fn new_with_shell_and_path(
-        properties: Properties,
+        mut properties: Properties,
         shell: Shell,
         target: Target,
         path: PathBuf,
         logical_path: PathBuf,
     ) -> Context<'a> {
         let config = StarshipConfig::initialize();
+
+        // If the vector is zero-length, we should pretend that we didn't get a
+        // pipestatus at all (since this is the input `--pipestatus=""`)
+        if properties
+            .pipestatus
+            .as_deref()
+            .map_or(false, |p| p.len() == 1 && p[0].is_empty())
+        {
+            properties.pipestatus = None;
+        }
+        log::trace!(
+            "Received completed pipestatus of {:?}",
+            properties.pipestatus
+        );
 
         // Canonicalize the current path to resolve symlinks, etc.
         // NOTE: On Windows this converts the path to extended-path syntax.
