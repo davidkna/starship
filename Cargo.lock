@@ -1811,6 +1811,7 @@ dependencies = [
  "sys-info",
  "tempfile",
  "terminal_size",
+ "thiserror",
  "toml",
  "toml_edit",
  "unicode-segmentation",

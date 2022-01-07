@@ -131,6 +131,9 @@ pub fn get_prompt(context: Context) -> String {
         buf = buf.replace('\n', " \\n");
     }
 
+    // Write back cache
+    context.cache.lock().unwrap().write().unwrap();
+
     buf
 }
 

@@ -1,4 +1,5 @@
 use process_control::{ChildExt, Control};
+use serde::{Deserialize, Serialize};
 use std::ffi::OsStr;
 use std::fmt::Debug;
 use std::fs::read_to_string;
@@ -60,7 +61,7 @@ pub fn create_command<T: AsRef<OsStr>>(binary_name: T) -> Result<Command> {
     Ok(cmd)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommandOutput {
     pub stdout: String,
     pub stderr: String,
@@ -72,7 +73,6 @@ impl PartialEq for CommandOutput {
     }
 }
 
-#[cfg(test)]
 pub fn display_command<T: AsRef<OsStr> + Debug, U: AsRef<OsStr> + Debug>(
     cmd: T,
     args: &[U],

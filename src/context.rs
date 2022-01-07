@@ -1,3 +1,4 @@
+use crate::cache::Cache;
 use crate::config::{RootModuleConfig, StarshipConfig};
 use crate::configs::StarshipRootConfig;
 use crate::module::Module;
@@ -18,6 +19,7 @@ use std::fs;
 use std::num::ParseIntError;
 use std::path::{Path, PathBuf};
 use std::string::String;
+use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use terminal_size::terminal_size;
 
@@ -27,6 +29,9 @@ use terminal_size::terminal_size;
 pub struct Context<'a> {
     /// The deserialized configuration map from the user's `starship.toml` file.
     pub config: StarshipConfig,
+
+    /// Cache for commands
+    pub cache: Mutex<Cache>,
 
     /// The current working directory that starship is being called in.
     pub current_dir: PathBuf,
@@ -107,6 +112,15 @@ impl<'a> Context<'a> {
         logical_path: PathBuf,
     ) -> Context<'a> {
         let config = StarshipConfig::initialize();
+        let cache_dir = env::var_os("STARSHIP_CACHE")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| {
+                utils::home_dir()
+                    .expect("Unable to find home directory")
+                    .join(".cache/starship")
+            });
+        fs::create_dir_all(&cache_dir).unwrap();
+        let cache = Mutex::new(Cache::new(cache_dir.join("cache.toml")).unwrap());
 
         // If the vector is zero-length, we should pretend that we didn't get a
         // pipestatus at all (since this is the input `--pipestatus=""`)
@@ -137,6 +151,7 @@ impl<'a> Context<'a> {
 
         Context {
             config,
+            cache,
             properties,
             current_dir,
             logical_dir,
@@ -298,24 +313,35 @@ impl<'a> Context<'a> {
             cmd,
             args
         );
+        let cmd_name = crate::utils::display_command(&cmd, args);
         #[cfg(test)]
         {
-            let command = crate::utils::display_command(&cmd, args);
             if let Some(output) = self
                 .cmd
-                .get(command.as_str())
+                .get(cmd_name.as_str())
                 .cloned()
                 .or_else(|| crate::utils::mock_cmd(&cmd, args))
             {
                 return output;
             }
         }
+
         let mut cmd = create_command(cmd).ok()?;
+        let mut cache = self.cache.lock().unwrap();
+        if let Some(output) = cache.get(Path::new(cmd.get_program()), cmd_name.as_str()) {
+            return Some(output.clone());
+        }
+        drop(cache);
         cmd.args(args).current_dir(&self.current_dir);
-        exec_timeout(
+        let output = exec_timeout(
             &mut cmd,
             Duration::from_millis(self.root_config.command_timeout),
-        )
+        );
+        if let Some(ref o) = output {
+            let mut cache = self.cache.lock().unwrap();
+            cache.set(Path::new(cmd.get_program()), cmd_name.as_str(), o);
+        }
+        output
     }
 }
 
