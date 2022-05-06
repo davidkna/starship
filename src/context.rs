@@ -15,11 +15,14 @@ use std::env;
 use std::ffi::{OsStr, OsString};
 use std::fmt::Debug;
 use std::fs;
+use std::io;
 use std::marker::PhantomData;
 use std::num::ParseIntError;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::string::String;
+use std::sync::{Arc, RwLock};
+use std::thread;
 use std::time::{Duration, Instant};
 use terminal_size::terminal_size;
 
@@ -38,8 +41,8 @@ pub struct Context<'a> {
     /// E.g. when navigating to a PSDrive in PowerShell, or a path without symlinks resolved.
     pub logical_dir: PathBuf,
 
-    /// A struct containing directory contents in a lookup-optimized format.
-    dir_contents: OnceCell<DirContents>,
+    /// A struct containing directory contents in a lookup-optimised format.
+    dir_contents: OnceCell<Arc<RwLock<DirContents>>>,
 
     /// Properties to provide to modules.
     pub properties: Properties,
@@ -273,10 +276,20 @@ impl<'a> Context<'a> {
         })
     }
 
-    pub fn dir_contents(&self) -> Result<&DirContents, std::io::Error> {
-        self.dir_contents.get_or_try_init(|| {
+    pub fn dir_contents(
+        &self,
+    ) -> Result<std::sync::RwLockReadGuard<'_, DirContents>, std::io::Error> {
+        let dc = self.dir_contents.get_or_try_init(|| {
             let timeout = self.root_config.scan_timeout;
             DirContents::from_path_with_timeout(&self.current_dir, Duration::from_millis(timeout))
+        });
+        dc.and_then(|c| {
+            c.read().map_err(|e| {
+                io::Error::new(
+                    io::ErrorKind::Other,
+                    format!("dir_contents lock poisoned: {e}"),
+                )
+            })
         })
     }
 
@@ -357,7 +370,7 @@ impl<'a> Context<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DirContents {
     // HashSet of all files, no folders, relative to the base directory given at construction.
     files: HashSet<PathBuf>,
@@ -371,53 +384,70 @@ pub struct DirContents {
 
 impl DirContents {
     #[cfg(test)]
-    fn from_path(base: &Path) -> Result<Self, std::io::Error> {
+    fn from_path(base: &Path) -> Result<Arc<RwLock<Self>>, std::io::Error> {
         Self::from_path_with_timeout(base, Duration::from_secs(30))
     }
 
-    fn from_path_with_timeout(base: &Path, timeout: Duration) -> Result<Self, std::io::Error> {
+    fn from_path_with_timeout(
+        base: &Path,
+        timeout: Duration,
+    ) -> Result<Arc<RwLock<Self>>, std::io::Error> {
         let start = Instant::now();
+        let main_thread = thread::current();
+        let dir_contents = Arc::new(RwLock::new(DirContents::default()));
+        let base = base.to_path_buf();
 
-        let mut folders: HashSet<PathBuf> = HashSet::new();
-        let mut files: HashSet<PathBuf> = HashSet::new();
-        let mut file_names: HashSet<String> = HashSet::new();
-        let mut extensions: HashSet<String> = HashSet::new();
+        let dir_contents_clone = dir_contents.clone();
 
-        fs::read_dir(base)?
-            .enumerate()
-            .take_while(|(n, _)| {
-                cfg!(test) // ignore timeout during tests
+        let _ = thread::spawn(move || {
+            let dir_contents = dir_contents_clone;
+            let files = match fs::read_dir(&base) {
+                Ok(files) => files,
+                Err(e) => {
+                    log::debug!("Failed to read directory: {}", e);
+                    return;
+                }
+            };
+            files
+                .enumerate()
+                .take_while(|(n, _)| {
+                    cfg!(test) // ignore timeout during tests
                 || n & 0xFF != 0 // only check timeout once every 2^8 entries
                 || start.elapsed() < timeout
-            })
-            .filter_map(|(_, entry)| entry.ok())
-            .for_each(|entry| {
-                let path = PathBuf::from(entry.path().strip_prefix(base).unwrap());
-                if entry.path().is_dir() {
-                    folders.insert(path);
-                } else {
-                    if !path.to_string_lossy().starts_with('.') {
-                        path.extension()
-                            .map(|ext| extensions.insert(ext.to_string_lossy().to_string()));
+                })
+                .filter_map(|(_, entry)| entry.ok())
+                .for_each(|entry| {
+                    let mut dir_contents = dir_contents.write().unwrap();
+                    let path = PathBuf::from(entry.path().strip_prefix(&base).unwrap());
+                    if entry.path().is_dir() {
+                        dir_contents.folders.insert(path);
+                    } else {
+                        if !path.to_string_lossy().starts_with('.') {
+                            path.extension().map(|ext| {
+                                dir_contents
+                                    .extensions
+                                    .insert(ext.to_string_lossy().to_string())
+                            });
+                        }
+                        if let Some(file_name) = path.file_name() {
+                            dir_contents
+                                .file_names
+                                .insert(file_name.to_string_lossy().to_string());
+                        }
+                        dir_contents.files.insert(path);
                     }
-                    if let Some(file_name) = path.file_name() {
-                        file_names.insert(file_name.to_string_lossy().to_string());
-                    }
-                    files.insert(path);
-                }
-            });
+                });
+            main_thread.unpark();
+        });
+
+        thread::park_timeout(timeout);
 
         log::trace!(
             "Building HashSets of directory files, folders and extensions took {:?}",
             start.elapsed()
         );
 
-        Ok(Self {
-            files,
-            file_names,
-            folders,
-            extensions,
-        })
+        Ok(dir_contents)
     }
 
     pub fn files(&self) -> impl Iterator<Item = &PathBuf> {
@@ -488,7 +518,7 @@ pub struct Remote {
 // A struct of Criteria which will be used to verify current PathBuf is
 // of X language, criteria can be set via the builder pattern
 pub struct ScanDir<'a> {
-    dir_contents: &'a DirContents,
+    dir_contents: std::sync::RwLockReadGuard<'a, DirContents>,
     files: &'a [&'a str],
     folders: &'a [&'a str],
     extensions: &'a [&'a str],
@@ -685,7 +715,7 @@ mod tests {
         let empty_dc = DirContents::from_path(empty.path())?;
 
         assert!(!ScanDir {
-            dir_contents: &empty_dc,
+            dir_contents: empty_dc.read().unwrap(),
             files: &["package.json"],
             extensions: &["js"],
             folders: &["node_modules"],
@@ -696,7 +726,7 @@ mod tests {
         let rust = testdir(&["README.md", "Cargo.toml", "src/main.rs"])?;
         let rust_dc = DirContents::from_path(rust.path())?;
         assert!(!ScanDir {
-            dir_contents: &rust_dc,
+            dir_contents: rust_dc.read().unwrap(),
             files: &["package.json"],
             extensions: &["js"],
             folders: &["node_modules"],
@@ -707,7 +737,7 @@ mod tests {
         let java = testdir(&["README.md", "src/com/test/Main.java", "pom.xml"])?;
         let java_dc = DirContents::from_path(java.path())?;
         assert!(!ScanDir {
-            dir_contents: &java_dc,
+            dir_contents: java_dc.read().unwrap(),
             files: &["package.json"],
             extensions: &["js"],
             folders: &["node_modules"],
@@ -718,7 +748,7 @@ mod tests {
         let node = testdir(&["README.md", "node_modules/lodash/main.js", "package.json"])?;
         let node_dc = DirContents::from_path(node.path())?;
         assert!(ScanDir {
-            dir_contents: &node_dc,
+            dir_contents: node_dc.read().unwrap(),
             files: &["package.json"],
             extensions: &["js"],
             folders: &["node_modules"],
