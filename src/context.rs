@@ -263,12 +263,15 @@ impl<'a> Context<'a> {
                 let dirs: [PathBuf; 0] = [];
                 Repository::open_ext(&self.current_dir, git2::RepositoryOpenFlags::FROM_ENV, dirs)
             }?;
+            let trust = git_sec::Trust::from_path_ownership(repository.path())
+                .unwrap_or(git_sec::Trust::Reduced);
             Ok(Repo {
                 branch: get_current_branch(&repository),
                 workdir: repository.workdir().map(Path::to_path_buf),
                 path: Path::to_path_buf(repository.path()),
                 state: repository.state(),
                 remote: get_remote_repository_info(&repository),
+                trust,
             })
         })
     }
@@ -470,6 +473,9 @@ pub struct Repo {
 
     /// Remote repository
     pub remote: Option<Remote>,
+
+    /// The level of trust in the repository.
+    pub trust: git_sec::Trust,
 }
 
 impl Repo {

@@ -792,6 +792,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "git-sec"
+version = "0.1.0"
+source = "git+https://github.com/Byron/gitoxide?branch=main#068a2de764fabff949ff49a50594563cc625e343"
+dependencies = [
+ "bitflags",
+ "libc",
+ "windows 0.36.1",
+]
+
+[[package]]
 name = "git2"
 version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2047,6 +2057,7 @@ dependencies = [
  "dirs-next",
  "dunce",
  "gethostname",
+ "git-sec",
  "git2",
  "guess_host_triple",
  "home",

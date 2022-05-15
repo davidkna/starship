@@ -21,6 +21,11 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
     };
 
     let repo = context.get_repo().ok()?;
+
+    if repo.trust != git_sec::Trust::Full {
+        return None;
+    }
+
     let repo_root = repo.workdir.as_ref()?;
 
     let diff = context
