@@ -263,7 +263,13 @@ jobs:
         uses: actions/download-artifact@v3
 
       - name: Setup | Checksums
-        run: for file in starship-*/starship-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
+        run: |
+          out="$PWD/SHA256SUMS"
+          for file in starship-*/starship-*;do
+            pushd "$(dirname "$file")"
+              openssl dgst -sha256 -r "$(basename "$file")" >> "$out"
+            popd
+          done
 
       - name: Setup | Publish Release
         run: gh release edit ${{ needs.release_please.outputs.tag_name }} --draft=false --repo=starship/starship
@@ -273,7 +279,9 @@ jobs:
       - name: Build | Add Artifacts to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: starship-*/starship-*
+          files: |
+            starship-*/starship-*
+            SHA256SUMS
           tag_name: ${{ needs.release_please.outputs.tag_name }}
 
   # Publish starship to Crates.io
