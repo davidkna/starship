@@ -297,16 +297,7 @@ date is read from the `AWSUME_EXPIRATION` env var.
 
 ### Options
 
-| Option              | Default                                                           | Description                                                                                                 |
-| ------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `format`            | `'on [$symbol($profile )(\($region\) )(\[$duration\] )]($style)'` | The format for the module.                                                                                  |
-| `symbol`            | `"☁️ "`                                                           | The symbol used before displaying the current AWS profile.                                                  |
-| `region_aliases`    |                                                                   | Table of region aliases to display in addition to the AWS name.                                             |
-| `profile_aliases`   |                                                                   | Table of profile aliases to display in addition to the AWS name.                                            |
-| `style`             | `"bold yellow"`                                                   | The style for the module.                                                                                   |
-| `expiration_symbol` | `X`                                                               | The symbol displayed when the temporary credentials have expired.                                           |
-| `disabled`          | `false`                                                           | Disables the `AWS` module.                                                                                  |
-| `force_display`     | `false`                                                           | If `true` displays info even if `credentials`, `credential_process` or `sso_start_url` have not been setup. |
+<<< _tables/Aws.md
 
 ### Variables
 
@@ -371,12 +362,7 @@ The `azure` module shows the current Azure Subscription. This is based on showin
 
 ### Options
 
-| Variable   | Default                                  | Description                                |
-| ---------- | ---------------------------------------- | ------------------------------------------ |
-| `format`   | `"on [$symbol($subscription)]($style) "` | The format for the Azure module to render. |
-| `symbol`   | `"ﴃ "`                                   | The symbol used in the format.             |
-| `style`    | `"blue bold"`                            | The style used in the format.              |
-| `disabled` | `true`                                   | Disables the `azure` module.               |
+<<< _tables/Azure.md
 
 ### Example
 
@@ -397,16 +383,7 @@ The module is only visible when the device's battery is below 10%.
 
 ### Options
 
-| Option               | Default                           | Description                                         |
-| -------------------- | --------------------------------- | --------------------------------------------------- |
-| `full_symbol`        | `" "`                            | The symbol shown when the battery is full.          |
-| `charging_symbol`    | `" "`                            | The symbol shown when the battery is charging.      |
-| `discharging_symbol` | `" "`                            | The symbol shown when the battery is discharging.   |
-| `unknown_symbol`     | `" "`                            | The symbol shown when the battery state is unknown. |
-| `empty_symbol`       | `" "`                            | The symbol shown when the battery state is empty.   |
-| `format`             | `"[$symbol$percentage]($style) "` | The format for the module.                          |
-| `display`            | [link](#battery-display)          | Display threshold and style for the module.         |
-| `disabled`           | `false`                           | Disables the `battery` module.                      |
+<<< _tables/Battery.md
 
 ### Example
 
@@ -436,12 +413,7 @@ The default value for the `charging_symbol` and `discharging_symbol` option is r
 
 The `display` option is an array of the following table.
 
-| Option               | Default    | Description                                                                                               |
-| -------------------- | ---------- | --------------------------------------------------------------------------------------------------------- |
-| `threshold`          | `10`       | The upper bound for the display option.                                                                   |
-| `style`              | `bold red` | The style used if the display option is in use.                                                           |
-| `charging_symbol`    | `-`        | Optional symbol displayed if display option is in use, defaults to battery's `charging_symbol` option.    |
-| `discharging_symbol` | `-`        | Optional symbol displayed if display option is in use, defaults to battery's `discharging_symbol` option. |
+<<< _tables/BatteryDisplay.md
 
 #### Example
 
@@ -467,16 +439,7 @@ The `buf` module shows the currently installed version of [Buf](https://buf.buil
 
 ### Options
 
-| Option              | Default                                                    | Description                                           |
-| ------------------- | ---------------------------------------------------------- | ----------------------------------------------------- |
-| `format`            | `'with [$symbol($version \(Buf $buf_version\) )]($style)'` | The format for the `buf` module.                      |
-| `version_format`    | `"v${raw}"`                                                | The version format.                                   |
-| `symbol`            | `"🦬 "`                                                     | The symbol used before displaying the version of Buf. |
-| `detect_extensions` | `[]`                                                       | Which extensions should trigger this module.          |
-| `detect_files`      | `["buf.yaml", "buf.gen.yaml", "buf.work.yaml"]`            | Which filenames should trigger this module.           |
-| `detect_folders`    | `[]`                                                       | Which folders should trigger this modules.            |
-| `style`             | `"bold blue"`                                              | The style for the module.                             |
-| `disabled`          | `false`                                                    | Disables the `elixir` module.                         |
+<<< _tables/Buf.md
 
 ### Variables
 
@@ -505,17 +468,7 @@ file.
 
 ### Options
 
-| Option              | Default                                                                     | Description                                                               |
-| ------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `format`            | `"via [$symbol($version(-$name) )]($style)"`                                | The format string for the module.                                         |
-| `version_format`    | `"v${raw}"`                                                                 | The version format. Available vars are `raw`, `major`, `minor`, & `patch` |
-| `symbol`            | `"C "`                                                                      | The symbol used before displaying the compiler details                    |
-| `detect_extensions` | `["c", "h"]`                                                                | Which extensions should trigger this module.                              |
-| `detect_files`      | `[]`                                                                        | Which filenames should trigger this module.                               |
-| `detect_folders`    | `[]`                                                                        | Which folders should trigger this module.                                 |
-| `commands`          | [ [ "cc", "--version" ], [ "gcc", "--version" ], [ "clang", "--version" ] ] | How to detect what the compiler is                                        |
-| `style`             | `"bold 149"`                                                                | The style for the module.                                                 |
-| `disabled`          | `false`                                                                     | Disables the `c` module.                                                  |
+<<< _tables/C.md
 
 ### Variables
 
@@ -569,16 +522,7 @@ are only supported in fish due to [upstream issues with mode detection in zsh](h
 
 ### Options
 
-| Option                      | Default              | Description                                                                             |
-| --------------------------- | -------------------- | --------------------------------------------------------------------------------------- |
-| `format`                    | `"$symbol "`         | The format string used before the text input.                                           |
-| `success_symbol`            | `"[❯](bold green)"`  | The format string used before the text input if the previous command succeeded.         |
-| `error_symbol`              | `"[❯](bold red)"`    | The format string used before the text input if the previous command failed.            |
-| `vimcmd_symbol`             | `"[❮](bold green)"`  | The format string used before the text input if the shell is in vim normal mode.        |
-| `vimcmd_replace_one_symbol` | `"[❮](bold purple)"` | The format string used before the text input if the shell is in vim `replace_one` mode. |
-| `vimcmd_replace_symbol`     | `"[❮](bold purple)"` | The format string used before the text input if the shell is in vim replace mode.       |
-| `vimcmd_visual_symbol`      | `"[❮](bold yellow)"` | The format string used before the text input if the shell is in vim replace mode.       |
-| `disabled`                  | `false`              | Disables the `character` module.                                                        |
+<<< _tables/Character.md
 
 ### Variables
 

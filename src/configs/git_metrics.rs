@@ -7,6 +7,7 @@ pub struct GitMetricsConfig<'a> {
     pub added_style: &'a str,
     pub deleted_style: &'a str,
     pub only_nonzero_diffs: bool,
+    /// The format for the module.
     pub format: &'a str,
     pub disabled: bool,
 }

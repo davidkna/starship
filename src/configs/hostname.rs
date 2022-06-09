@@ -7,7 +7,9 @@ pub struct HostnameConfig<'a> {
     pub ssh_only: bool,
     pub ssh_symbol: &'a str,
     pub trim_at: &'a str,
+    /// The format for the module.
     pub format: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     pub disabled: bool,
 }

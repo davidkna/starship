@@ -5,9 +5,11 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct ShLvlConfig<'a> {
     pub threshold: i64,
+    /// The format for the module.
     pub format: &'a str,
     pub symbol: &'a str,
     pub repeat: bool,
+    /// The style for the module.
     pub style: &'a str,
     pub disabled: bool,
 }

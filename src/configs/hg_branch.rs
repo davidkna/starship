@@ -5,7 +5,9 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct HgBranchConfig<'a> {
     pub symbol: &'a str,
+    /// The style for the module.
     pub style: &'a str,
+    /// The format for the module.
     pub format: &'a str,
     pub truncation_length: i64,
     pub truncation_symbol: &'a str,

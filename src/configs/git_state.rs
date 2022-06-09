@@ -11,7 +11,9 @@ pub struct GitStateConfig<'a> {
     pub bisect: &'a str,
     pub am: &'a str,
     pub am_or_rebase: &'a str,
+    /// The style for the module.
     pub style: &'a str,
+    /// The format for the module.
     pub format: &'a str,
     pub disabled: bool,
 }

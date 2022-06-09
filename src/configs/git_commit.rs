@@ -5,7 +5,9 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct GitCommitConfig<'a> {
     pub commit_hash_length: usize,
+    /// The format for the module.
     pub format: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     pub only_detached: bool,
     pub disabled: bool,

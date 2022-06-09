@@ -1583,18 +1583,22 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the Azure module to render.",
           "default": "on [$symbol($subscription)]($style) ",
           "type": "string"
         },
         "symbol": {
+          "description": "The symbol used in the format.",
           "default": "ﴃ ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "blue bold",
           "type": "string"
         },
         "disabled": {
+          "description": "Disables the `azure` module.",
           "default": true,
           "type": "boolean"
         }
@@ -1604,26 +1608,32 @@
       "type": "object",
       "properties": {
         "full_symbol": {
+          "description": "The symbol shown when the battery is full.",
           "default": " ",
           "type": "string"
         },
         "charging_symbol": {
+          "description": "The symbol shown when the battery is charging.",
           "default": " ",
           "type": "string"
         },
         "discharging_symbol": {
+          "description": "The symbol shown when the battery is discharging.",
           "default": " ",
           "type": "string"
         },
         "unknown_symbol": {
+          "description": "The symbol shown when the battery state is unknown.",
           "default": " ",
           "type": "string"
         },
         "empty_symbol": {
+          "description": "The symbol shown when the battery state is empty.",
           "default": " ",
           "type": "string"
         },
         "display": {
+          "description": "Display threshold and style for the module.",
           "default": [
             {
               "charging_symbol": null,
@@ -1638,10 +1648,12 @@
           }
         },
         "disabled": {
+          "description": "Disables the `battery` module.",
           "default": false,
           "type": "boolean"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol$percentage]($style) ",
           "type": "string"
         }
@@ -1651,15 +1663,18 @@
       "type": "object",
       "properties": {
         "threshold": {
+          "description": "The upper bound for the display",
           "default": 10,
           "type": "integer",
           "format": "int64"
         },
         "style": {
+          "description": "The style used if the display option is in use. The style for the module.",
           "default": "red bold",
           "type": "string"
         },
         "charging_symbol": {
+          "description": "Optional symbol displayed if display option is in use, defaults to battery's `charging_symbol` option.",
           "default": null,
           "type": [
             "string",
@@ -1667,6 +1682,7 @@
           ]
         },
         "discharging_symbol": {
+          "description": "Optional symbol displayed if display option is in use, defaults to battery's `discharging_symbol` option.",
           "default": null,
           "type": [
             "string",
@@ -1679,26 +1695,32 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the `buf` module.",
           "default": "with [$symbol ($version)]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
         "symbol": {
+          "description": "The symbol used before displaying the version of Buf.",
           "default": "",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
         "disabled": {
+          "description": "Disables the `elixir` module.",
           "default": false,
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1706,6 +1728,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "buf.yaml",
             "buf.gen.yaml",
@@ -1717,6 +1740,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1729,26 +1753,32 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format string for the module.",
           "default": "via [$symbol($version(-$name) )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "149 bold",
           "type": "string"
         },
         "symbol": {
+          "description": "The symbol used before displaying the compiler details",
           "default": "C ",
           "type": "string"
         },
         "disabled": {
+          "description": "Disables the `c` module.",
           "default": false,
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "c",
             "h"
@@ -1759,6 +1789,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1766,6 +1797,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1773,6 +1805,7 @@
           }
         },
         "commands": {
+          "description": "How to detect what the compiler is",
           "default": [
             [
               "cc",
@@ -1801,18 +1834,22 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "$symbol ",
           "type": "string"
         },
         "success_symbol": {
+          "description": "The format string used before the text input if the previous command succeeded.",
           "default": "[❯](bold green)",
           "type": "string"
         },
         "error_symbol": {
+          "description": "The format string used before the text input if the previous command failed.",
           "default": "[❯](bold red)",
           "type": "string"
         },
         "vimcmd_symbol": {
+          "description": "The format string used before the text input if the shell is in vim normal mode.",
           "default": "[❮](bold green)",
           "type": "string"
         },
@@ -1821,14 +1858,17 @@
           "type": "string"
         },
         "vimcmd_replace_symbol": {
+          "description": "he format string used before the text input if the shell is in vim replace mode.",
           "default": "[❮](bold purple)",
           "type": "string"
         },
         "vimcmd_replace_one_symbol": {
+          "description": "The format string used before the text input if the shell is in vim `replace_one` mode.",
           "default": "[❮](bold purple)",
           "type": "string"
         },
         "disabled": {
+          "description": "Disables the `character` module.",
           "default": false,
           "type": "boolean"
         }
@@ -1838,10 +1878,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -1850,6 +1892,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -1858,6 +1901,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1865,6 +1909,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "CMakeLists.txt",
             "CMakeCache.txt"
@@ -1875,6 +1920,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1892,10 +1938,12 @@
           "format": "int64"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "took [$duration]($style) ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "yellow bold",
           "type": "string"
         },
@@ -1930,10 +1978,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -1942,6 +1992,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -1950,6 +2001,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "cbl",
             "cob",
@@ -1962,6 +2014,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1969,6 +2022,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -1987,6 +2041,7 @@
           "minimum": 0.0
         },
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol$environment]($style) ",
           "type": "string"
         },
@@ -1995,6 +2050,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "green bold",
           "type": "string"
         },
@@ -2012,6 +2068,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol \\[$name\\]]($style) ",
           "type": "string"
         },
@@ -2020,6 +2077,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "red bold dimmed",
           "type": "string"
         },
@@ -2033,10 +2091,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2045,6 +2105,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold red",
           "type": "string"
         },
@@ -2053,6 +2114,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "cr"
           ],
@@ -2062,6 +2124,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "shard.yml"
           ],
@@ -2071,6 +2134,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2087,14 +2151,17 @@
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold cyan",
           "type": "string"
         },
@@ -2103,6 +2170,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2110,6 +2178,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "daml.yaml"
           ],
@@ -2119,6 +2188,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2131,10 +2201,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2143,6 +2215,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -2151,6 +2224,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "dart"
           ],
@@ -2160,6 +2234,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "pubspec.yaml",
             "pubspec.yml",
@@ -2171,6 +2246,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             ".dart_tool"
           ],
@@ -2185,10 +2261,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2197,6 +2275,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "green bold",
           "type": "string"
         },
@@ -2205,6 +2284,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2212,6 +2292,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "deno.json",
             "deno.jsonc",
@@ -2226,6 +2307,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2263,6 +2345,7 @@
           "type": "boolean"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$path]($style)[$read_only]($read_only_style) ",
           "type": "string"
         },
@@ -2271,6 +2354,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "cyan bold",
           "type": "string"
         },
@@ -2315,10 +2399,12 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "blue bold",
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol$context]($style) ",
           "type": "string"
         },
@@ -2331,6 +2417,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2338,6 +2425,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "docker-compose.yml",
             "docker-compose.yaml",
@@ -2349,6 +2437,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2361,10 +2450,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )(🎯 $tfm )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2373,6 +2464,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "blue bold",
           "type": "string"
         },
@@ -2385,6 +2477,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "csproj",
             "fsproj",
@@ -2396,6 +2489,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "global.json",
             "project.json",
@@ -2409,6 +2503,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2421,10 +2516,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version \\(OTP $otp_version\\) )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2433,6 +2530,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold purple",
           "type": "string"
         },
@@ -2441,6 +2539,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2448,6 +2547,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "mix.exs"
           ],
@@ -2457,6 +2557,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2469,10 +2570,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2481,6 +2584,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "cyan bold",
           "type": "string"
         },
@@ -2489,6 +2593,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "elm"
           ],
@@ -2498,6 +2603,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "elm.json",
             "elm-package.json",
@@ -2509,6 +2615,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             "elm-stuff"
           ],
@@ -2527,6 +2634,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "black bold dimmed",
           "type": "string"
         },
@@ -2543,6 +2651,7 @@
           ]
         },
         "format": {
+          "description": "The format for the module.",
           "default": "with [$env_value]($style) ",
           "type": "string"
         },
@@ -2556,10 +2665,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2568,6 +2679,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold red",
           "type": "string"
         },
@@ -2576,6 +2688,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2583,6 +2696,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "rebar.config",
             "erlang.mk"
@@ -2593,6 +2707,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2605,6 +2720,7 @@
       "type": "object",
       "properties": {
         "style": {
+          "description": "The style for the module.",
           "default": "bold black",
           "type": "string"
         },
@@ -2622,6 +2738,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "on [$symbol$account(@$domain)(\\($region\\))]($style) ",
           "type": "string"
         },
@@ -2630,6 +2747,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -2657,6 +2775,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "on [$symbol$branch(:$remote_branch)]($style) ",
           "type": "string"
         },
@@ -2665,6 +2784,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold purple",
           "type": "string"
         },
@@ -2708,10 +2828,12 @@
           "minimum": 0.0
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[\\($hash$tag\\)]($style) ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "green bold",
           "type": "string"
         },
@@ -2749,6 +2871,7 @@
           "type": "boolean"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "([+$added]($added_style) )([-$deleted]($deleted_style) )",
           "type": "string"
         },
@@ -2790,10 +2913,12 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold yellow",
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "\\([$state( $progress_current/$progress_total)]($style)\\) ",
           "type": "string"
         },
@@ -2807,10 +2932,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "([\\[$all_status$ahead_behind\\]]($style) )",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "red bold",
           "type": "string"
         },
@@ -2878,10 +3005,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2890,6 +3019,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold cyan",
           "type": "string"
         },
@@ -2898,6 +3028,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "go"
           ],
@@ -2907,6 +3038,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "go.mod",
             "go.sum",
@@ -2922,6 +3054,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             "Godeps"
           ],
@@ -2936,10 +3069,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -2948,6 +3083,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold purple",
           "type": "string"
         },
@@ -2956,6 +3092,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "hs",
             "cabal",
@@ -2967,6 +3104,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "stack.yaml",
             "cabal.project"
@@ -2977,6 +3115,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -2989,10 +3128,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3001,6 +3142,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold white",
           "type": "string"
         },
@@ -3009,6 +3151,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3016,6 +3159,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "helmfile.yaml",
             "Chart.yaml"
@@ -3026,6 +3170,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3042,10 +3187,12 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold purple",
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "on [$symbol$branch]($style) ",
           "type": "string"
         },
@@ -3080,10 +3227,12 @@
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$ssh_symbol$hostname]($style) in ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "green dimmed bold",
           "type": "string"
         },
@@ -3101,14 +3250,17 @@
           "type": "boolean"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "red dimmed",
           "type": "string"
         },
@@ -3117,6 +3269,7 @@
           "type": "string"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "java",
             "class",
@@ -3131,6 +3284,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "pom.xml",
             "build.gradle.kts",
@@ -3146,6 +3300,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3173,6 +3328,7 @@
           "format": "int64"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol$number]($style) ",
           "type": "string"
         },
@@ -3181,6 +3337,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -3194,10 +3351,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3206,6 +3365,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold purple",
           "type": "string"
         },
@@ -3214,6 +3374,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "jl"
           ],
@@ -3223,6 +3384,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "Project.toml",
             "Manifest.toml"
@@ -3233,6 +3395,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3245,10 +3408,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3257,6 +3422,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -3269,6 +3435,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "kt",
             "kts"
@@ -3279,6 +3446,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3286,6 +3454,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3302,10 +3471,12 @@
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol$context( \\($namespace\\))]($style) in ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "cyan bold",
           "type": "string"
         },
@@ -3328,6 +3499,7 @@
           }
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3335,6 +3507,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3342,6 +3515,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3367,10 +3541,12 @@
           "type": "boolean"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$localipv4]($style) ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "yellow bold",
           "type": "string"
         },
@@ -3384,10 +3560,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3396,6 +3574,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -3408,6 +3587,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "lua"
           ],
@@ -3417,6 +3597,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             ".lua-version"
           ],
@@ -3426,6 +3607,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             "lua"
           ],
@@ -3445,10 +3627,12 @@
           "format": "int64"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "via $symbol[$ram( | $swap)]($style) ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "white bold dimmed",
           "type": "string"
         },
@@ -3466,10 +3650,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3478,6 +3664,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "yellow bold",
           "type": "string"
         },
@@ -3486,6 +3673,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "nim",
             "nims",
@@ -3497,6 +3685,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "nim.cfg"
           ],
@@ -3506,6 +3695,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3518,6 +3708,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol$state( \\($name\\))]($style) ",
           "type": "string"
         },
@@ -3526,6 +3717,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -3547,10 +3739,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3559,6 +3753,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold green",
           "type": "string"
         },
@@ -3571,6 +3766,7 @@
           "type": "string"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "js",
             "mjs",
@@ -3585,6 +3781,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "package.json",
             ".node-version",
@@ -3596,6 +3793,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             "node_modules"
           ],
@@ -3610,10 +3808,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )(\\($switch_indicator$switch_name\\) )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3630,6 +3830,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold yellow",
           "type": "string"
         },
@@ -3638,6 +3839,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "opam",
             "ml",
@@ -3651,6 +3853,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "dune",
             "dune-project",
@@ -3664,6 +3867,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             "_opam",
             "esy.lock"
@@ -3679,6 +3883,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "on [$symbol$cloud(\\($project\\))]($style) ",
           "type": "string"
         },
@@ -3687,6 +3892,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold yellow",
           "type": "string"
         },
@@ -3700,6 +3906,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "is [$symbol$version]($style) ",
           "type": "string"
         },
@@ -3708,6 +3915,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "208 bold",
           "type": "string"
         },
@@ -3720,6 +3928,7 @@
           "type": "boolean"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         }
@@ -3729,10 +3938,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3741,6 +3952,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "149 bold",
           "type": "string"
         },
@@ -3749,6 +3961,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "pl",
             "pm",
@@ -3760,6 +3973,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "Makefile.PL",
             "Build.PL",
@@ -3775,6 +3989,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3787,10 +4002,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3799,6 +4016,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "147 bold",
           "type": "string"
         },
@@ -3807,6 +4025,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "php"
           ],
@@ -3816,6 +4035,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "composer.json",
             ".php-version"
@@ -3826,6 +4046,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3838,10 +4059,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($username@)$stack]($style) ",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3850,6 +4073,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold 5",
           "type": "string"
         },
@@ -3867,10 +4091,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -3879,6 +4105,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold white",
           "type": "string"
         },
@@ -3887,6 +4114,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "purs"
           ],
@@ -3896,6 +4124,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "spago.dhall"
           ],
@@ -3905,6 +4134,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -3937,14 +4167,17 @@
           ]
         },
         "format": {
+          "description": "The format for the module.",
           "default": "via [${symbol}${pyenv_prefix}(${version} )(\\($virtualenv\\) )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "yellow bold",
           "type": "string"
         },
@@ -3957,6 +4190,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "py"
           ],
@@ -3966,6 +4200,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "requirements.txt",
             ".python-version",
@@ -3981,6 +4216,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4006,10 +4242,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version-$vm_version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "${raw}",
           "type": "string"
         },
@@ -4018,6 +4256,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "149 bold",
           "type": "string"
         },
@@ -4026,6 +4265,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "p6",
             "pm6",
@@ -4039,6 +4279,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "META6.json"
           ],
@@ -4048,6 +4289,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4060,10 +4302,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4072,6 +4316,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "red bold",
           "type": "string"
         },
@@ -4080,6 +4325,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "red",
             "reds"
@@ -4090,6 +4336,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4097,6 +4344,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4109,14 +4357,17 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "blue bold",
           "type": "string"
         },
@@ -4129,6 +4380,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "R",
             "Rd",
@@ -4142,6 +4394,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             ".Rprofile"
           ],
@@ -4151,6 +4404,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             ".Rproj.user"
           ],
@@ -4165,10 +4419,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4177,6 +4433,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold red",
           "type": "string"
         },
@@ -4185,6 +4442,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "rb"
           ],
@@ -4194,6 +4452,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "Gemfile",
             ".ruby-version"
@@ -4204,6 +4463,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4226,10 +4486,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4238,6 +4500,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold red",
           "type": "string"
         },
@@ -4246,6 +4509,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "rs"
           ],
@@ -4255,6 +4519,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "Cargo.toml"
           ],
@@ -4264,6 +4529,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4276,10 +4542,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4288,6 +4556,7 @@
           "type": "boolean"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "red bold",
           "type": "string"
         },
@@ -4296,6 +4565,7 @@
           "type": "string"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "sbt",
             "scala"
@@ -4306,6 +4576,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             ".scalaenv",
             ".sbtenv",
@@ -4317,6 +4588,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             ".metals"
           ],
@@ -4331,6 +4603,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "[$indicator]($style) ",
           "type": "string"
         },
@@ -4379,6 +4652,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "white bold",
           "type": "string"
         },
@@ -4397,6 +4671,7 @@
           "format": "int64"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol$shlvl]($style) ",
           "type": "string"
         },
@@ -4409,6 +4684,7 @@
           "type": "boolean"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold yellow",
           "type": "string"
         },
@@ -4426,10 +4702,12 @@
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol\\[$env\\]]($style) ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "blue bold dimmed",
           "type": "string"
         },
@@ -4449,6 +4727,7 @@
           "minimum": 0.0
         },
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol$environment]($style) ",
           "type": "string"
         },
@@ -4457,6 +4736,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "blue bold",
           "type": "string"
         },
@@ -4470,6 +4750,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol$status]($style) ",
           "type": "string"
         },
@@ -4498,6 +4779,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold red",
           "type": "string"
         },
@@ -4531,6 +4813,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "[as $symbol]($style)",
           "type": "string"
         },
@@ -4539,6 +4822,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold blue",
           "type": "string"
         },
@@ -4556,10 +4840,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4568,6 +4854,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold 202",
           "type": "string"
         },
@@ -4576,6 +4863,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "swift"
           ],
@@ -4585,6 +4873,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "Package.swift"
           ],
@@ -4594,6 +4883,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4606,10 +4896,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol$workspace]($style) ",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4618,6 +4910,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold 105",
           "type": "string"
         },
@@ -4626,6 +4919,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "tf",
             "tfplan",
@@ -4637,6 +4931,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4644,6 +4939,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [
             ".terraform"
           ],
@@ -4658,10 +4954,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "at [$time]($style) ",
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold yellow",
           "type": "string"
         },
@@ -4693,6 +4991,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "[$user]($style) in ",
           "type": "string"
         },
@@ -4718,10 +5017,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4730,6 +5031,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "cyan bold",
           "type": "string"
         },
@@ -4738,6 +5040,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4745,6 +5048,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "Vagrantfile"
           ],
@@ -4754,6 +5058,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4770,10 +5075,12 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold yellow",
           "type": "string"
         },
         "format": {
+          "description": "The format for the module.",
           "default": "vcsh [$symbol$repo]($style) ",
           "type": "string"
         },
@@ -4787,10 +5094,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4799,6 +5108,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "blue bold",
           "type": "string"
         },
@@ -4807,6 +5117,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "v"
           ],
@@ -4816,6 +5127,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [
             "v.mod",
             "vpkg.json",
@@ -4827,6 +5139,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4839,10 +5152,12 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "via [$symbol($version )]($style)",
           "type": "string"
         },
         "version_format": {
+          "description": "The version format. Available vars are `raw`, `major`, `minor`, & `patch`",
           "default": "v${raw}",
           "type": "string"
         },
@@ -4851,6 +5166,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "bold yellow",
           "type": "string"
         },
@@ -4859,6 +5175,7 @@
           "type": "boolean"
         },
         "detect_extensions": {
+          "description": "Which extensions should trigger this module.",
           "default": [
             "zig"
           ],
@@ -4868,6 +5185,7 @@
           }
         },
         "detect_files": {
+          "description": "Which filenames should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4875,6 +5193,7 @@
           }
         },
         "detect_folders": {
+          "description": "Which folders should trigger this module.",
           "default": [],
           "type": "array",
           "items": {
@@ -4887,6 +5206,7 @@
       "type": "object",
       "properties": {
         "format": {
+          "description": "The format for the module.",
           "default": "[$symbol($output )]($style)",
           "type": "string"
         },
@@ -4919,6 +5239,7 @@
           "type": "string"
         },
         "style": {
+          "description": "The style for the module.",
           "default": "green bold",
           "type": "string"
         },

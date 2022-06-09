@@ -5,13 +5,14 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct CmdDurationConfig<'a> {
     pub min_time: i64,
+    /// The format for the module.
     pub format: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     pub show_milliseconds: bool,
     pub disabled: bool,
     pub show_notifications: bool,
     pub min_time_to_notify: i64,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notification_timeout: Option<u32>,
 }

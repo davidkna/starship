@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "config-schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct StatusConfig<'a> {
+    /// The format for the module.
     pub format: &'a str,
     pub symbol: &'a str,
     pub success_symbol: &'a str,
@@ -11,6 +12,7 @@ pub struct StatusConfig<'a> {
     pub not_found_symbol: &'a str,
     pub sigint_symbol: &'a str,
     pub signal_symbol: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     pub map_symbol: bool,
     pub recognize_signal_code: bool,

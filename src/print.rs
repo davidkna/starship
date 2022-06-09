@@ -450,6 +450,66 @@ pub fn print_schema() {
     println!("{}", serde_json::to_string_pretty(&schema).unwrap());
 }
 
+#[cfg(feature = "config-schema")]
+pub fn update_schema() -> io::Result<()> {
+    use std::fs;
+    let schema = schemars::schema_for!(crate::configs::FullConfig);
+
+    // Generate json-schema file
+    let schema_file = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(".github/config-schema.json")?;
+    serde_json::to_writer_pretty(schema_file, &schema).expect("write schema");
+
+    // Generate module config tables
+    for (name, definition) in schema.definitions.iter() {
+        // Skip other definitions like `Either<String, Vec<String>>`
+        let name = match name.strip_suffix("Config") {
+            Some(name) => name,
+            None => continue,
+        };
+
+        let definition = definition.clone().into_object();
+        let out_path = std::path::Path::new("docs")
+            .join("config")
+            .join("_tables")
+            .join(name)
+            .with_extension("md");
+        let mut out = fs::File::create(out_path)?;
+
+        let obj = match definition.object {
+            Some(obj) => obj,
+            None => continue,
+        };
+
+        writeln!(out, "| Option | Default | Description |")?;
+        for (option, prop) in obj.properties.iter() {
+            let meta = match prop.clone().into_object().metadata {
+                Some(meta) => meta,
+                None => continue,
+            };
+            let default = meta
+                .default
+                .as_ref()
+                .filter(|v| !v.is_null())
+                .and_then(|d| {
+                    toml_edit::easy::Value::try_from(d)
+                        .ok()
+                        .map(|v| v.to_string())
+                        // Some values can't be converted to a TOML string,
+                        // so we try showing the JSON representation instead.
+                        .or_else(|| serde_json::to_string(d).ok())
+                })
+                .map(|d| format!("`{}`", d))
+                .unwrap_or_default();
+            let description = meta.description.unwrap_or_default();
+            writeln!(out, "| `{option}` | {default} | {description} |")?;
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

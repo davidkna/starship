@@ -289,12 +289,13 @@ everyone remember what they are. Don't worry: most of them are quite simple!
 
 - [ ] Add a section to `docs/config/README.md` describing the module, and
       its configuration options/variables (more documentation is often
-      appropriate--this is a bare minimum).
+      appropriate--this is a bare minimum). For the list of config options, please
+      include the generated table from `docs/config/_tables/<Module>.md`
 - [ ] Add the variable to the appropriate location in the "Default Prompt
       Format" section of the documentation
 - [ ] Add an appropriate choice of options to each preset in `docs/presets/README.md`
-- [ ] Update the config file schema by running `cargo run --features config-schema -- config-schema > .github/config-schema.json`
-- [ ] Create configs structs/traits in `src/configs/<module>.rs` and add the
+- [ ] Update generated files by running `cargo run --features config-schema -- update-schema` from the workspace root
+- [ ] Create configs structs/traits in `src/configs/<module>.rs` (with `///` comments for each option) and add the
       following:
   - [ ] An entry in `PROMPT_ORDER` (`src/configs/starship_root.rs`)
   - [ ] An entry in `FullConfig` and the `Default` impl (`src/configs/mod.rs`)

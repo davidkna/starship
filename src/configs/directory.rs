@@ -11,8 +11,10 @@ pub struct DirectoryConfig<'a> {
     pub substitutions: IndexMap<String, &'a str>,
     pub fish_style_pwd_dir_length: i64,
     pub use_logical_path: bool,
+    /// The format for the module.
     pub format: &'a str,
     pub repo_root_format: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     pub repo_root_style: Option<&'a str>,
     pub disabled: bool,

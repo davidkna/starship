@@ -5,11 +5,13 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct EnvVarConfig<'a> {
     pub symbol: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub variable: Option<&'a str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<&'a str>,
+    /// The format for the module.
     pub format: &'a str,
     pub disabled: bool,
 }

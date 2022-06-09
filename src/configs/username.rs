@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "config-schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct UsernameConfig<'a> {
+    /// The format for the module.
     pub format: &'a str,
     pub style_root: &'a str,
     pub style_user: &'a str,

@@ -30,9 +30,9 @@ The minimal, blazing-fast, and infinitely customizable prompt for any shell! ☄
 """
 
 [features]
-default = ["battery", "notify"]
+default = ["battery", "notify", "config-schema"]
 battery = ["starship-battery"]
-config-schema = ["schemars"]
+config-schema = ["schemars", "toml_edit/easy"]
 notify = ["notify-rust"]
 
 [dependencies]

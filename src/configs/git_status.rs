@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "config-schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct GitStatusConfig<'a> {
+    /// The format for the module.
     pub format: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     pub stashed: &'a str,
     pub ahead: &'a str,

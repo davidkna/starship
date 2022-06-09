@@ -100,6 +100,10 @@ enum Commands {
     #[cfg(feature = "config-schema")]
     /// Generate a schema for the starship configuration as JSON-schema
     ConfigSchema,
+    /// Update repository config schema and related vuepress files
+    #[cfg(feature = "config-schema")]
+    #[clap(hide = true)]
+    UpdateSchema,
 }
 
 fn main() {
@@ -222,6 +226,8 @@ fn main() {
         ),
         #[cfg(feature = "config-schema")]
         Commands::ConfigSchema => print::print_schema(),
+        #[cfg(feature = "config-schema")]
+        Commands::UpdateSchema => print::update_schema().expect("can't update generated files"),
     }
 }
 

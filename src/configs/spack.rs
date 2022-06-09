@@ -5,8 +5,10 @@ use serde::{Deserialize, Serialize};
 #[serde(default)]
 pub struct SpackConfig<'a> {
     pub truncation_length: usize,
+    /// The format for the module.
     pub format: &'a str,
     pub symbol: &'a str,
+    /// The style for the module.
     pub style: &'a str,
     pub disabled: bool,
 }

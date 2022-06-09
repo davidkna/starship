@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "config-schema", derive(schemars::JsonSchema))]
 #[serde(default)]
 pub struct FillConfig<'a> {
+    /// The style for the module.
     pub style: &'a str,
     pub symbol: &'a str,
     pub disabled: bool,
