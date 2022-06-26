@@ -195,10 +195,9 @@ jobs:
       - name: Install cargo-wix [Windows]
         continue-on-error: true
         if: matrix.os == 'windows-latest' && matrix.rust == 'stable'
-        run: cargo install --version 0.3.2 cargo-wix
+        run: cargo install --git https://github.com/volks73/cargo-wix.git --rev bd714cf8361e00b34e1390a7da92cefe5a33bbe  cargo-wix
         env:
-          # cargo-wix does not require static crt
-          RUSTFLAGS: ''
+          RUSTFLAGS: '-Copt-level=0'
 
       # Install Mercurial (pre-installed on Linux and windows)
       - name: Setup | Mercurial (macos)
