@@ -326,6 +326,28 @@ jobs:
           iwr https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
           ./wingetcreate.exe update Starship.Starship -s -v $version -u $env:URL_64 $env:URL_32 -t ${{ secrets.GH_PAT }}
 
+  msixbundle:
+    name: Create msixbundle for MS Store
+    runs-on: windows-latest
+    continue-on-error: true
+    needs: upload_artifacts
+    if: ${{ needs.release_please.outputs.release_created == 'true' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: msixbundle | Download artifacts
+        uses: actions/download-artifact@v3
+
+      - name: msixbundle | Run
+        run: pwsh install/windows/create_msixbundle.ps1
+
+      - name: msixbundle | Upload mxixbundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: starship.msixbundle
+          path: target/starship.msixbundle
+
   merge_crowdin_pr:
     name: Merge Crowdin PR
     runs-on: ubuntu-latest
