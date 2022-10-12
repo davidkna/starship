@@ -10,7 +10,7 @@ use super::{Context, Module, ModuleConfig};
 use crate::configs::rust::RustConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 use crate::utils::create_command;
-use home::rustup_home;
+use home::rustup_home_with_cwd;
 
 use once_cell::sync::OnceCell;
 
@@ -94,7 +94,7 @@ impl RustToolingEnvironmentInfo {
         self.rustup_rustc_output.get_or_init(|| {
             let out = if let Some(toolchain) = self.get_env_toolchain_override(context) {
                 // First try runnig ~/.rustup/toolchains/<toolchain>/bin/rustc --version
-                rustup_home()
+                rustup_home_with_cwd(&context.current_dir)
                     .map(|rustup_folder| {
                         rustup_folder
                             .join("toolchains")
@@ -461,8 +461,10 @@ fn strip_dos_path(path: PathBuf) -> PathBuf {
 }
 
 impl RustupSettings {
-    fn load(_context: &Context) -> Option<Self> {
-        let path = rustup_home().ok()?.join("settings.toml");
+    fn load(context: &Context) -> Option<Self> {
+        let path = rustup_home_with_cwd(&context.current_dir)
+            .ok()?
+            .join("settings.toml");
         Self::from_toml_str(&fs::read_to_string(path).ok()?)
     }
 
