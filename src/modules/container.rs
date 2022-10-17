@@ -196,4 +196,54 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    #[cfg(target_os = "linux")]
+    fn test_docker() -> std::io::Result<()> {
+        use std::io::Write;
+
+        let renderer = ModuleRenderer::new("container")
+            // For a custom config
+            .config(toml::toml! {
+               [container]
+               disabled = false
+            });
+
+        let root_path = renderer.root_path();
+
+        let mut cgroup = PathBuf::from(root_path);
+
+        cgroup.push("proc");
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .create(&cgroup)?;
+
+        cgroup.push("1");
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .create(&cgroup)?;
+
+        cgroup.push("cgroup");
+        let mut file = std::fs::File::create(&cgroup)?;
+        file.write_all(b"0::/docker/1234")?;
+
+        // The output of the module
+        let actual = renderer
+            // Run the module and collect the output
+            .collect();
+
+        // The value that should be rendered by the module.
+        let expected = Some(format!(
+            "{} ",
+            Color::Red
+                .bold()
+                .dimmed()
+                .paint(format!("⬢ [{}]", "Docker"))
+        ));
+
+        // Assert that the actual and expected values are the same
+        assert_eq!(actual, expected);
+
+        Ok(())
+    }
 }
