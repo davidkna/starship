@@ -1,5 +1,7 @@
 let-env STARSHIP_SHELL = "nu"
 let-env STARSHIP_SESSION_KEY = (random chars -l 16)
+# Set up fake job count variable
+let-env STARSHIP_JOBS = "0"
 let-env PROMPT_MULTILINE_INDICATOR = (^::STARSHIP:: prompt --continuation)
 
 # Does not play well with default character module.

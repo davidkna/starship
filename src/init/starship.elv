@@ -1,5 +1,10 @@
 set-env STARSHIP_SHELL "elvish"
 set-env STARSHIP_SESSION_KEY (to-string (randint 10000000000000 10000000000000000))
+# Set up base variables
+set-env STARSHIP_JOBS "0"
+set-env STARSHIP_STATUS "0"
+set-env STARSHIP_DURATION "0"
+unset-env STARSHIP_PIPESTATUS
 
 # Define Hooks
 var cmd-status-code = 0
@@ -23,11 +28,15 @@ set edit:after-command = [ $@edit:after-command $starship-after-command-hook~ ]
 
 # Install starship
 set edit:prompt = {
-    var cmd-duration = (printf "%.0f" (* $edit:command-duration 1000))
-    ::STARSHIP:: prompt --jobs=$num-bg-jobs --cmd-duration=$cmd-duration --status=$cmd-status-code --logical-path=$pwd
+    set-env STARSHIP_STATUS $cmd-status-code
+    set-env STARSHIP_DURATION (printf "%.0f" (* $edit:command-duration 1000))
+    set-env STARSHIP_JOBS $num-bg-jobs
+    ::STARSHIP:: prompt --logical-path=$pwd
 }
 
 set edit:rprompt = {
-    var cmd-duration = (printf "%.0f" (* $edit:command-duration 1000))
-    ::STARSHIP:: prompt --right --jobs=$num-bg-jobs --cmd-duration=$cmd-duration --status=$cmd-status-code --logical-path=$pwd
+    set-env STARSHIP_STATUS $cmd-status-code
+    set-env STARSHIP_DURATION (printf "%.0f" (* $edit:command-duration 1000))
+    set-env STARSHIP_JOBS $num-bg-jobs
+    ::STARSHIP:: prompt --right --logical-path=$pwd
 }

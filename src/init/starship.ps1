@@ -112,7 +112,7 @@ $null = New-Module starship {
         } catch {}
 
         # @ makes sure the result is an array even if single or no values are returned
-        $jobs = @(Get-Job | Where-Object { $_.State -eq 'Running' }).Count
+        $ENV:STARSHIP_JOBS = @(Get-Job | Where-Object { $_.State -eq 'Running' }).Count
 
         $cwd = Get-Cwd
         $arguments = @(
@@ -120,7 +120,6 @@ $null = New-Module starship {
             "--path=$($cwd.Path)",
             "--logical-path=$($cwd.LogicalPath)",
             "--terminal-width=$($Host.UI.RawUI.WindowSize.Width)",
-            "--jobs=$($jobs)"
         )
 
         # We start from the premise that the command executed correctly, which covers also the fresh console.
@@ -197,6 +196,9 @@ $null = New-Module starship {
 
     # Set up the session key that will be used to store logs
     $ENV:STARSHIP_SESSION_KEY = -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 16 | ForEach-Object { [char]$_ })
+
+    # Set up initial jobs variable
+    $ENV:STARSHIP_JOBS = "0"
 
     # Invoke Starship and set continuation prompt
     Set-PSReadLineOption -ContinuationPrompt (

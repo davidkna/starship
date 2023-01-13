@@ -681,7 +681,7 @@ pub struct Properties {
     #[clap(short = 'k', long, default_value = "viins")]
     pub keymap: String,
     /// The number of currently running jobs
-    #[clap(short, long, default_value_t, value_parser=parse_jobs)]
+    #[clap(short, long, default_value_t, value_parser=parse_jobs, env = "STARSHIP_JOBS")]
     pub jobs: i64,
 }
 

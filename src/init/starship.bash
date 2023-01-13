@@ -32,23 +32,23 @@ starship_preexec() {
 # Will be run before the prompt is drawn
 starship_precmd() {
     # Save the status, because commands in this pipeline will change $?
-    STARSHIP_CMD_STATUS=$? STARSHIP_PIPE_STATUS=(${PIPESTATUS[@]})
-    if [[ "${#BP_PIPESTATUS[@]}" -gt "${#STARSHIP_PIPE_STATUS[@]}" ]]; then
-        STARSHIP_PIPE_STATUS=(${BP_PIPESTATUS[@]})
+    STARSHIP_STATUS=$? STARSHIP_PIPESTATUS=(${PIPESTATUS[@]})
+    if [[ "${#BP_PIPESTATUS[@]}" -gt "${#STARSHIP_PIPESTATUS[@]}" ]]; then
+        STARSHIP_PIPESTATUS=(${BP_PIPESTATUS[@]})
     fi
 
-    local NUM_JOBS=0
+    STARSHIP_JOBS=0
     # Evaluate the number of jobs before running the preserved prompt command, so that tools
     # like z/autojump, which background certain jobs, do not cause spurious background jobs
     # to be displayed by starship. Also avoids forking to run `wc`, slightly improving perf.
-    for job in $(jobs -p); do [[ $job ]] && ((NUM_JOBS++)); done
+    for job in $(jobs -p); do [[ $job ]] && ((STARSHIP_JOBS++)); done
 
     # Run the bash precmd function, if it's set. If not set, evaluates to no-op
     "${starship_precmd_user_func-:}"
 
     # Set $? to the preserved value before running additional parts of the prompt
     # command pipeline, which may rely on it.
-    _starship_set_return "$STARSHIP_CMD_STATUS"
+    _starship_set_return "$STARSHIP_STATUS"
 
     eval "$_PRESERVED_PROMPT_COMMAND"
 
@@ -56,11 +56,9 @@ starship_precmd() {
     if [[ $STARSHIP_START_TIME ]]; then
         STARSHIP_END_TIME=$(::STARSHIP:: time)
         STARSHIP_DURATION=$((STARSHIP_END_TIME - STARSHIP_START_TIME))
-        PS1="$(::STARSHIP:: prompt --terminal-width="$COLUMNS" --status=$STARSHIP_CMD_STATUS --pipestatus="${STARSHIP_PIPE_STATUS[*]}" --jobs="$NUM_JOBS" --cmd-duration=$STARSHIP_DURATION)"
         unset STARSHIP_START_TIME
-    else
-        PS1="$(::STARSHIP:: prompt --terminal-width="$COLUMNS" --status=$STARSHIP_CMD_STATUS --pipestatus="${STARSHIP_PIPE_STATUS[*]}" --jobs="$NUM_JOBS")"
     fi
+    PS1="$(::STARSHIP:: prompt --terminal-width="$COLUMNS")"
     STARSHIP_PREEXEC_READY=true  # Signal that we can safely restart the timer
 }
 
@@ -110,6 +108,12 @@ export STARSHIP_SHELL="bash"
 STARSHIP_SESSION_KEY="$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM"; # Random generates a number b/w 0 - 32767
 STARSHIP_SESSION_KEY="${STARSHIP_SESSION_KEY}0000000000000000" # Pad it to 16+ chars.
 export STARSHIP_SESSION_KEY=${STARSHIP_SESSION_KEY:0:16}; # Trim to 16-digits if excess.
+
+# Set up base values for variables
+export STARSHIP_JOBS="0"
+export STARSHIP_STATUS="0"
+export STARSHIP_PIPESTATUS="0"
+export STARSHIP_DURATION="0"
 
 # Set the continuation prompt
 PS2="$(::STARSHIP:: prompt --continuation)"

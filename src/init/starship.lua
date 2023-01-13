@@ -71,3 +71,5 @@ end
 
 os.setenv('STARSHIP_SHELL', 'cmd')
 os.setenv('STARSHIP_SESSION_KEY', randomkey)
+-- Set up fake job count variable
+os.setenv('STARSHIP_JOBS', '0')

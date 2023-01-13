@@ -7,3 +7,5 @@ set STARSHIP_POSTCMD = 'set STARSHIP_START_TIME = `::STARSHIP:: time`';
 alias precmd "$STARSHIP_PRECMD;$USER_PRECMD";
 alias postcmd "$STARSHIP_POSTCMD;$USER_POSTCMD";
 set STARSHIP_START_TIME = `::STARSHIP:: time`;
+# Set up fake jobs variable
+set STARSHIP_JOBS = "0";
