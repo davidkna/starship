@@ -1,5 +1,6 @@
 use super::utils::truncate::truncate_text;
 use super::{Context, Module, ModuleConfig};
+use libpijul::TxnT;
 
 use crate::configs::pijul_channel::PijulConfig;
 use crate::formatter::StringFormatter;
@@ -62,12 +63,11 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
 }
 
 fn get_pijul_current_channel(ctx: &Context) -> Option<String> {
-    let output = ctx.exec_cmd("pijul", &["channel"])?.stdout;
-
-    output
-        .lines()
-        .find_map(|l| l.strip_prefix("* "))
-        .map(str::to_owned)
+    let repo =
+        libpijul::pristine::sanakirja::Pristine::new(&ctx.current_dir.join(".pijul/pristine/db"))
+            .ok()?;
+    let txn = repo.txn_begin().ok()?;
+    txn.current_channel().ok().map(|c| c.to_string())
 }
 
 #[cfg(test)]
