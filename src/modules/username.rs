@@ -10,7 +10,13 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
     #[cfg(test)]
     let mut username = context.get_env(USERNAME_ENV_VAR)?;
     #[cfg(not(test))]
-    let mut username = whoami::username();
+    let mut username = match whoami::fallible::username() {
+        Ok(username) => username,
+        Err(err) => {
+            log::warn!("Username is not available: {err:?}");
+            return None;
+        }
+    };
 
     let mut module = context.new_module("username");
     let config: UsernameConfig = UsernameConfig::try_load(module.config);

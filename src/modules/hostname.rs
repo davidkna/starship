@@ -23,7 +23,13 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
         return None;
     }
 
-    let os_hostname: OsString = whoami::hostname_os();
+    let os_hostname: OsString = match whoami::fallible::hostname_os() {
+        Ok(hostname) => hostname,
+        Err(err) => {
+            log::warn!("hostname is not available: {err:?}");
+            return None;
+        }
+    };
 
     let host = match os_hostname.into_string() {
         Ok(host) => host,
