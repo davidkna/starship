@@ -247,6 +247,8 @@ mod test {
     use crate::utils::read_file;
     use log::Log;
     use std::io;
+    use std::fs::{File, FileTimes};
+    use std::time::SystemTime;
 
     #[test]
     fn test_log_to_file() -> io::Result<()> {
@@ -353,11 +355,7 @@ mod test {
     }
 
     #[test]
-    #[cfg(unix)]
     fn test_cleanup() -> io::Result<()> {
-        use nix::sys::{stat::utimes, time::TimeVal};
-        use std::fs::File;
-
         let log_dir = tempfile::tempdir()?;
 
         // Should not be deleted
@@ -379,6 +377,10 @@ mod test {
         }
         fs::create_dir(&directory)?;
 
+        let times = FileTimes::new()
+            .set_accessed(SystemTime::UNIX_EPOCH)
+            .set_modified(SystemTime::UNIX_EPOCH);
+
         // Set all files except the new file to be older than 24 hours
         for file in &[
             &non_matching_file,
@@ -386,10 +388,12 @@ mod test {
             &old_file,
             &directory,
         ] {
-            utimes(file.as_path(), &TimeVal::new(0, 0), &TimeVal::new(0, 0))?;
-            if let Ok(f) = File::open(file) {
-                f.sync_all()?;
-            }
+            let Ok(f) = File::open(file) else {
+                panic!("Unable to open file {file:?}!")
+            };
+
+            f.set_times(times)?;
+            f.sync_all()?;
         }
 
         cleanup_log_files(log_dir.path());
