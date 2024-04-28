@@ -219,6 +219,26 @@ jobs:
         env:
           STARSHIP_VERSION: v1.2.3
 
+      - name: Sign | Upload Executable [Windows]
+        uses: actions/upload-artifact@v4
+        continue-on-error: true
+        if: matrix.os == 'windows-latest' && matrix.rust == 'stable'
+        with:
+          name: windows-executable
+          path: target/debug/starship.exe
+
+      - name: Sign | Sign Executable [Windows]
+        uses: signpath/github-action-submit-signing-request@v0.3
+        continue-on-error: true
+        if: matrix.os == 'windows-latest' && matrix.rust == 'stable'
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'starship.rs'
+          github-artifact-name: 'windows-executable'
+          signing-policy-slug: 'test-signing'
+          wait-for-completion: false
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         if: github.repository == 'starship/starship'

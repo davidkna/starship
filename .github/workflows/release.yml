@@ -117,6 +117,30 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: cross build --release --locked --target ${{ matrix.target }}
 
+      - name: Sign | Upload executable [Windows]
+        continue-on-error: true
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ matrix.name }}-exe
+          path: target/${{ matrix.target }}/release/starship.exe
+
+      - name: Sign | Sign executable [Windows]
+        continue-on-error: true
+        if: matrix.os == 'windows-latest'
+        uses: signpath/github-action-submit-signing-request@v0.3
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'starship.rs'
+          signing-policy-slug: 'test-signing'
+          github-artifact-name: 'unsigned-${{ matrix.name }}-exe'
+          wait-for-completion: false
+          # TODO use release-signing certificate:
+          # signing-policy-slug: 'release-signing'
+          # wait-for-completion: true
+          # output-artifact-directory: 'target/${{ matrix.target }}/release'
+
       - name: Build | Installer [Windows]
         continue-on-error: true
         if: matrix.os == 'windows-latest' && matrix.target != 'aarch64-pc-windows-msvc'
@@ -153,6 +177,30 @@ jobs:
           name: starship-${{ matrix.target }}.msi
           path: target/wix/starship-${{ matrix.target }}.msi
 
+      - name: Sign | Installer [Windows]
+        continue-on-error: true
+        if: matrix.os == 'windows-latest' && matrix.target != 'aarch64-pc-windows-msvc'
+        uses: signpath/github-action-submit-signing-request@v0.3
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'starship.rs'
+          signing-policy-slug: 'test-signing'
+          github-artifact-name: 'starship-${{ matrix.target }}.msi'
+          wait-for-completion: false
+          # TODO:
+          # signing-policy-slug: 'release-signing'
+          # wait-for-completion: true
+          # output-artifact-directory: 'target/wix'
+
+      # - name: Release | Re-upload signed installer artifacts [Windows]
+      #   continue-on-error: true
+      #   if: matrix.os == 'windows-latest' && matrix.target != 'aarch64-pc-windows-msvc'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     overwrite: true
+      #     name: starship-${{ matrix.target }}.msi
+      #     path: target/wix/starship-${{ matrix.target }}.msi
   # Notarize starship binaries for MacOS and build notarized pkg installers
   notarize_and_pkgbuild:
     runs-on: macos-latest
