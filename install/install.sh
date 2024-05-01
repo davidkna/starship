@@ -236,10 +236,13 @@ detect_arch() {
   esac
 
   # `uname -m` in some cases mis-reports 32-bit OS as 64-bit, so double check
-  if [ "${arch}" = "x86_64" ] && [ "$(getconf LONG_BIT)" -eq 32 ]; then
-    arch=i686
-  elif [ "${arch}" = "aarch64" ] && [ "$(getconf LONG_BIT)" -eq 32 ]; then
-    arch=arm
+  # Some platforms don't have `getconf`, so avoid this check if it's not available (#5947)
+  if has getconf; then
+    if [ "${arch}" = "x86_64" ] && [ "$(getconf LONG_BIT)" -eq 32 ]; then
+      arch=i686
+    elif [ "${arch}" = "aarch64" ] && [ "$(getconf LONG_BIT)" -eq 32 ]; then
+      arch=arm
+    fi
   fi
 
   printf '%s' "${arch}"
