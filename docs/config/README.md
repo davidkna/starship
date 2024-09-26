@@ -61,7 +61,11 @@ $ENV:STARSHIP_CONFIG__STATUS__DISABLED = "false"
 ```
 
 Other shells may use a different syntax to set environment variables.
-At this time, only simple values like such as numbers, floats, booleans and strings can be set with environment variables. This method cannot be used to set complex values like tables or arrays. If the environment values cannot be directly parsed as TOML values, they are treated as strings. This means that `true` is parsed as a boolean when it's not quoted, but is parsed as a string when it is quoted. In contrast, when a value matches neither a number, float, nor boolean like `starship` is found, it is treated as a string.
+Any values set in the environment will be parsed as TOML-values, not as full documents. If the environment values cannot be directly parsed as TOML-values, they are treated as strings.
+
+This means that `true` is parsed as a boolean when it's not quoted, but is parsed as a string when it is quoted. In contrast, when a value that cannot be parsed as a TOML value, such as `starship` is found, it is treated as a string (`"starship"`).
+
+Because the values are TOML-values the `[table]` syntax will not work, but inline tables `{ a = 1 }` or arrays `[ 0, 1 ]`.
 
 ### Logging
 

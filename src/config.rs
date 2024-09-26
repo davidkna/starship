@@ -578,21 +578,10 @@ fn parse_color_string(
 }
 
 /// Parses a string as a simple TOML value (String, Integer, etc.)
-/// TODO: support complex values like arrays/tables?
+/// If the string is not a valid TOML value, it is assumed to be a string.
 fn parse_toml_value(value: &str) -> Value {
-    use toml_edit::Value as EValue;
-    if let Ok(t) = value.parse::<EValue>() {
-        // Support for parsing quoted values, to allow parsing "true" as a string
-        match t {
-            EValue::String(s) => return Value::String(s.into_value()),
-            EValue::Integer(s) => return Value::Integer(s.into_value()),
-            EValue::Float(s) => return Value::Float(s.into_value()),
-            EValue::Boolean(s) => return Value::Boolean(s.into_value()),
-            _ => (),
-        }
-    };
-
-    Value::String(value.to_owned())
+    Value::deserialize(toml::de::ValueDeserializer::new(value))
+        .unwrap_or_else(|_| Value::String(value.to_owned()))
 }
 
 fn get_palette<'a>(
@@ -1121,6 +1110,22 @@ mod tests {
         assert!(parse_toml_value("0.0").is_float());
         assert_eq!(parse_toml_value("a string").as_str().unwrap(), "a string");
         assert_eq!(parse_toml_value("\"true\"").as_str().unwrap(), "true");
+        assert_eq!(
+            parse_toml_value("[0, 1, 2]")
+                .try_into::<Vec<i64>>()
+                .unwrap(),
+            vec![0, 1, 2]
+        );
+
+        assert_eq!(
+            parse_toml_value("{a = 1}")
+                .as_table()
+                .unwrap()
+                .iter()
+                .map(|(k, v)| (k.as_str(), v.as_integer().unwrap()))
+                .collect::<Vec<_>>(),
+            vec![("a", 1)]
+        );
     }
 
     #[test]
