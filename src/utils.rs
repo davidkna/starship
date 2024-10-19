@@ -523,10 +523,10 @@ pub fn wrap_seq_for_shell(
     escape_end: char,
 ) -> String {
     let (beg, end) = match shell {
-        // \[ and \]
-        Shell::Bash => ("\u{5c}\u{5b}", "\u{5c}\u{5d}"),
+        // \1 and \2
+        Shell::Bash => ("\x01", "\x02"),
         // %{ and %}
-        Shell::Tcsh | Shell::Zsh => ("\u{25}\u{7b}", "\u{25}\u{7d}"),
+        Shell::Tcsh | Shell::Zsh => ("%{", "%}"),
         _ => return ansi,
     };
 
@@ -878,10 +878,10 @@ mod tests {
         let bresult4 = wrap_seq_for_shell(test4.to_string(), Shell::Bash, '\x1b', 'm');
         let bresult5 = wrap_seq_for_shell(test5.to_string(), Shell::Bash, '\x1b', 'm');
 
-        assert_eq!(&bresult0, "\\[\x1b2m\\]hellomynamekeyes\\[\x1b2m\\]");
-        assert_eq!(&bresult1, "\\[\x1b]330;m\\]lol\\[\x1b]0m\\]");
-        assert_eq!(&bresult2, "\\[\x1bJ\\]");
-        assert_eq!(&bresult3, "\\[OH NO\\]");
+        assert_eq!(&bresult0, "\x01\x1b2m\x02hellomynamekeyes\x01\x1b2m\x02");
+        assert_eq!(&bresult1, "\x01\x1b]330;m\x02lol\x01\x1b]0m\x02");
+        assert_eq!(&bresult2, "\x01\x1bJ\x02");
+        assert_eq!(&bresult3, "\x01OH NO\x02");
         assert_eq!(&bresult4, "herpaderp");
         assert_eq!(&bresult5, "");
     }
