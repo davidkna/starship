@@ -420,7 +420,7 @@ fn get_repo_status(
                 }
             }
             // Keep it for potential reuse by `git_metrics`
-            repo_status.changes.push(change);
+            repo_status.changes.push(dbg!(change));
         }
         if is_interrupted.load(std::sync::atomic::Ordering::Relaxed) {
             repo_status = RepoStatus {
