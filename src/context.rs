@@ -295,10 +295,10 @@ impl<'a> Context<'a> {
 
                 // don't use the global git configs
                 let config = gix::open::permissions::Config {
-                    git_binary: false,
-                    system: false,
-                    git: false,
-                    user: false,
+                    git_binary: true,
+                    system: true,
+                    git: true,
+                    user: true,
                     env: true,
                     includes: true,
                 };
