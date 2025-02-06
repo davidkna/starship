@@ -9,9 +9,7 @@ use std::collections::HashMap;
     schemars(deny_unknown_fields)
 )]
 #[serde(default)]
-pub struct StarshipRootConfig {
-    #[serde(rename = "$schema")]
-    schema: String,
+pub struct StarshipGlobalConfig {
     pub format: String,
     pub right_format: String,
     pub continuation_prompt: String,
@@ -24,6 +22,19 @@ pub struct StarshipRootConfig {
     pub palettes: HashMap<String, Palette>,
     pub profiles: IndexMap<String, String>,
 }
+
+pub static GLOBAL_CONFIG_KEYS: &[&str] = &[
+    "format",
+    "right_format",
+    "continuation_prompt",
+    "scan_timeout",
+    "command_timeout",
+    "add_newline",
+    "follow_symlinks",
+    "palette",
+    "palettes",
+    "profiles",
+];
 
 pub type Palette = HashMap<String, String>;
 
@@ -131,10 +142,9 @@ pub const PROMPT_ORDER: &[&str] = &[
 ];
 
 // On changes please also update `Default` for the `FullConfig` struct in `mod.rs`
-impl Default for StarshipRootConfig {
+impl Default for StarshipGlobalConfig {
     fn default() -> Self {
         Self {
-            schema: "https://starship.rs/config-schema.json".to_string(),
             format: "$all".to_string(),
             right_format: String::new(),
             continuation_prompt: "[∙](bright-black) ".to_string(),

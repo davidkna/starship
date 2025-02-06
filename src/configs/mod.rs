@@ -99,6 +99,15 @@ pub mod zig;
 
 pub use starship_root::*;
 
+// This avoids needing to manually implement Default for the entire FullConfig struct
+#[derive(Serialize, Deserialize, Clone)]
+struct ConfigSchemaUrl(String);
+impl Default for ConfigSchemaUrl {
+    fn default() -> Self {
+        Self("https://starship.rs/config-schema.json".to_string())
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Default)]
 #[cfg_attr(
     feature = "config-schema",
@@ -108,11 +117,9 @@ pub use starship_root::*;
 #[serde(default)]
 pub struct FullConfig<'a> {
     // Meta
-    #[serde(rename = "$schema")]
-    schema: String,
+    schema: ConfigSchemaUrl,
     // Root config
-    #[serde(flatten)]
-    root: StarshipRootConfig,
+    global: StarshipGlobalConfig,
     // modules
     #[serde(borrow)]
     aws: aws::AwsConfig<'a>,

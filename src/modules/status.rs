@@ -824,6 +824,7 @@ mod tests {
 
         let renderer = ModuleRenderer::new("status")
             .config(toml::toml! {
+                [global]
                 format = "$fill$status"
                 [status]
                 style = "fg:white bg:red bold"

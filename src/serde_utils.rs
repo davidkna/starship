@@ -1,4 +1,3 @@
-use crate::module::ALL_MODULES;
 use serde::de::{
     value::{Error as ValueError, MapDeserializer, SeqDeserializer},
     Deserializer, Error, IntoDeserializer, Visitor,
@@ -172,15 +171,6 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
     where
         V: Visitor<'de>,
     {
-        if self
-            .info
-            .filter(|StructInfo { name, .. }| name == &"StarshipRootConfig")
-            .and(self.current_key)
-            .is_some_and(|key| ALL_MODULES.contains(&key) || key == "custom" || key == "env_var")
-        {
-            return visitor.visit_none();
-        }
-
         if !self.error_on_ignored {
             return visitor.visit_none();
         }
@@ -224,8 +214,6 @@ impl<'de> Deserializer<'de> for ValueDeserializer<'de> {
 
 #[cfg(test)]
 mod test {
-    use crate::configs::StarshipRootConfig;
-
     use super::*;
     use serde::Deserialize;
 
@@ -369,36 +357,6 @@ mod test {
             format!("{result}"),
             "Error in 'Sample' at 'unknown_key': Unknown key"
         );
-    }
-
-    #[test]
-    fn test_deserialize_unknown_root_config() {
-        let value = toml::toml! {
-            unknown_key = "foo"
-        };
-
-        let deserializer = ValueDeserializer::new(&value);
-        let result = StarshipRootConfig::deserialize(deserializer).unwrap_err();
-        assert_eq!(
-            format!("{result}"),
-            "Error in 'StarshipRoot' at 'unknown_key': Unknown key"
-        );
-
-        let deserializer2 = ValueDeserializer::new(&value).with_allow_unknown_keys();
-        let result = StarshipRootConfig::deserialize(deserializer2);
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_deserialize_unknown_root_module() {
-        let value = toml::toml! {
-            [rust]
-            disabled = true
-        };
-        let deserializer = ValueDeserializer::new(&value);
-
-        let result = StarshipRootConfig::deserialize(deserializer);
-        assert!(result.is_ok())
     }
 
     #[test]

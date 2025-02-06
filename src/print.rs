@@ -527,6 +527,7 @@ mod test {
     #[test]
     fn main_prompt() {
         let mut context = default_context().set_config(toml::toml! {
+                [global][global]
                 add_newline=false
                 format="$character"
                 [character]
@@ -542,6 +543,7 @@ mod test {
     #[test]
     fn right_prompt() {
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 right_format="$character"
                 [character]
                 format=">\n>"
@@ -556,6 +558,7 @@ mod test {
     #[test]
     fn prompt_with_all() -> io::Result<()> {
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 add_newline = false
                 right_format= "$directory$line_break"
                 format="$all"
@@ -574,6 +577,7 @@ mod test {
     #[test]
     fn rprompt_with_all() -> io::Result<()> {
         let mut context = default_context().set_config(toml::toml! {
+            [global]
             format= "$directory$line_break"
             right_format="$all"
             [character]
@@ -593,8 +597,9 @@ mod test {
     #[test]
     fn custom_prompt() {
         let mut context = default_context().set_config(toml::toml! {
+            [global]
             add_newline = false
-            [profiles]
+            [global.profiles]
             test="0_0$character"
             [character]
             format=">>"
@@ -609,6 +614,7 @@ mod test {
     #[test]
     fn custom_prompt_fallback() {
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 add_newline=false
                 [profiles]
                 test="0_0$character"
@@ -625,6 +631,7 @@ mod test {
     #[test]
     fn continuation_prompt() {
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 continuation_prompt="><>"
         });
         context.target = Target::Continuation;
@@ -670,6 +677,7 @@ mod test {
     fn custom_expands() -> std::io::Result<()> {
         let dir = tempfile::tempdir()?;
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 format="$custom"
                 [custom.a]
                 when=true
@@ -689,6 +697,7 @@ mod test {
     #[test]
     fn env_expands() {
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 format="$env_var"
                 [env_var]
                 format="$env_value"
@@ -711,6 +720,7 @@ mod test {
     fn custom_mixed() -> std::io::Result<()> {
         let dir = tempfile::tempdir()?;
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 format="${custom.c}$custom${custom.b}"
                 [custom.a]
                 when=true
@@ -733,6 +743,7 @@ mod test {
     #[test]
     fn env_mixed() {
         let mut context = default_context().set_config(toml::toml! {
+            [global]
                 format="${env_var.c}$env_var${env_var.b}"
                 [env_var]
                 format="$env_value"
@@ -758,6 +769,7 @@ mod test {
     fn custom_subset() -> std::io::Result<()> {
         let dir = tempfile::tempdir()?;
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 format="${custom.b}"
                 [custom.a]
                 when=true
@@ -778,6 +790,7 @@ mod test {
     fn custom_missing() -> std::io::Result<()> {
         let dir = tempfile::tempdir()?;
         let mut context = default_context().set_config(toml::toml! {
+                [global]
                 format="${custom.b}"
                 [custom.a]
                 when=true

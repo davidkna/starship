@@ -1,7 +1,7 @@
 use crate::config::{ModuleConfig, StarshipConfig};
-use crate::configs::StarshipRootConfig;
+use crate::configs::{FullConfig, StarshipGlobalConfig, GLOBAL_CONFIG_KEYS};
 use crate::context_env::Env;
-use crate::module::Module;
+use crate::module::{Module, ALL_MODULES};
 use crate::utils::{create_command, exec_timeout, read_file, CommandOutput, PathExt};
 
 use crate::modules;
@@ -33,7 +33,7 @@ use terminal_size::terminal_size;
 /// of the prompt.
 pub struct Context<'a> {
     /// The deserialized configuration map from the user's `starship.toml` file.
-    pub config: StarshipConfig,
+    pub config: FullConfig<'a>,
 
     /// The current working directory that starship is being called in.
     pub current_dir: PathBuf,
@@ -129,6 +129,25 @@ impl<'a> Context<'a> {
     ) -> Self {
         let config = StarshipConfig::initialize(&get_config_path_os(&env));
 
+        for key in config.keys() {
+            if ALL_MODULES.contains(key) || ["custom", "env_var"].contains(&key) {
+                continue;
+            }
+            if GLOBAL_CONFIG_KEYS.contains(&key) {
+                log::warn!(
+                    "The key `{key}` in the root of your starship.toml is deprecated and will be removed in a future release. Please move it to the `global` table.",
+                );
+                let val = config.take(key).unwrap();
+                config
+                    .get_or_insert("global", toml::Table::new())
+                    .insert(key.to_string(), val);
+                continue;
+            }
+            log::warn!(
+                "The key `{key}` in the your starship.toml is not a valid module name and will be ignored."
+            );
+        }
+
         // If the vector is zero-length, we should pretend that we didn't get a
         // pipestatus at all (since this is the input `--pipestatus=""`)
         if properties
@@ -157,7 +176,8 @@ impl<'a> Context<'a> {
         let root_config = config
             .config
             .as_ref()
-            .map_or_else(StarshipRootConfig::default, StarshipRootConfig::load);
+            .and_then(|config| config.get("global"))
+            .map_or_else(StarshipGlobalConfig::default, StarshipGlobalConfig::load);
 
         let width = properties.terminal_width;
 
@@ -185,7 +205,7 @@ impl<'a> Context<'a> {
 
     /// Sets the context config, overwriting the existing config
     pub fn set_config(mut self, config: toml::Table) -> Self {
-        self.root_config = StarshipRootConfig::load(&config);
+        self.root_config = StarshipGlobalConfig::try_load(config.get("global"));
         self.config = StarshipConfig {
             config: Some(config),
         };
