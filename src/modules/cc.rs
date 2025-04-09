@@ -114,7 +114,7 @@ pub fn module<'a>(context: &'a Context, lang: Lang) -> Option<Module<'a>> {
             let lang = "c";
             let compilers = [("clang", "clang"), ("gcc", "Free Software Foundation")];
             let module = context.new_module(lang);
-            let config = CConfig::try_load(module.config).0;
+            let config = CConfig::try_load(module.config);
 
             create_module::<CConfigMarker>(context, lang, compilers, module, config)
         }
@@ -122,7 +122,7 @@ pub fn module<'a>(context: &'a Context, lang: Lang) -> Option<Module<'a>> {
             let lang = "cpp";
             let compilers = [("clang++", "clang"), ("g++", "Free Software Foundation")];
             let module = context.new_module(lang);
-            let config = CppConfig::try_load(module.config).0;
+            let config = CppConfig::try_load(module.config);
 
             create_module::<CppConfigMarker>(context, lang, compilers, module, config)
         }
