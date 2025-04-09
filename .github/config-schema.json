@@ -134,7 +134,7 @@
       },
       "allOf": [
         {
-          "$ref": "#/definitions/CConfig"
+          "$ref": "#/definitions/CcConfig_for_CConfigMarker"
         }
       ]
     },
@@ -278,7 +278,7 @@
       },
       "allOf": [
         {
-          "$ref": "#/definitions/CppConfig"
+          "$ref": "#/definitions/CcConfig_for_CppConfigMarker"
         }
       ]
     },
@@ -2312,7 +2312,7 @@
       },
       "additionalProperties": false
     },
-    "CConfig": {
+    "CcConfig_for_CConfigMarker": {
       "type": "object",
       "properties": {
         "format": {
@@ -2623,7 +2623,7 @@
       },
       "additionalProperties": false
     },
-    "CppConfig": {
+    "CcConfig_for_CppConfigMarker": {
       "type": "object",
       "properties": {
         "format": {

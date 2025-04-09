@@ -1,8 +1,8 @@
 use super::{Context, Module, ModuleConfig};
 
-use crate::configs::c::CConfig;
+use crate::configs::c::{CConfig, CConfigMarker};
 use crate::configs::cc::CcConfig;
-use crate::configs::cpp::CppConfig;
+use crate::configs::cpp::{CppConfig, CppConfigMarker};
 use crate::formatter::StringFormatter;
 use crate::formatter::VersionFormatter;
 
@@ -116,7 +116,7 @@ pub fn module<'a>(context: &'a Context, lang: Lang) -> Option<Module<'a>> {
             let module = context.new_module(lang);
             let config = CConfig::try_load(module.config).0;
 
-            create_module::<CConfig>(context, lang, compilers, module, config)
+            create_module::<CConfigMarker>(context, lang, compilers, module, config)
         }
         Lang::Cpp => {
             let lang = "cpp";
@@ -124,7 +124,7 @@ pub fn module<'a>(context: &'a Context, lang: Lang) -> Option<Module<'a>> {
             let module = context.new_module(lang);
             let config = CppConfig::try_load(module.config).0;
 
-            create_module::<CppConfig>(context, lang, compilers, module, config)
+            create_module::<CppConfigMarker>(context, lang, compilers, module, config)
         }
     }
 }

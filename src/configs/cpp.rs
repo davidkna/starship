@@ -7,13 +7,21 @@ use serde::{Deserialize, Serialize};
     derive(schemars::JsonSchema),
     schemars(deny_unknown_fields)
 )]
-#[serde(transparent)]
-pub struct CppConfig<'a>(#[serde(borrow)] pub CcConfig<'a, CppConfig<'a>>);
+pub struct CppConfigMarker;
 
-impl Default for CcConfig<'_, CppConfig<'_>> {
+#[derive(Default, Clone, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "config-schema",
+    derive(schemars::JsonSchema),
+    schemars(deny_unknown_fields)
+)]
+#[serde(transparent)]
+pub struct CppConfig<'a>(#[serde(borrow)] pub CcConfig<'a, CppConfigMarker>);
+
+impl Default for CcConfig<'_, CppConfigMarker> {
     fn default() -> Self {
         CcConfig {
-            marker: std::marker::PhantomData::<CppConfig<'_>>,
+            marker: std::marker::PhantomData::<CppConfigMarker>,
             format: "via [$symbol($version(-$name) )]($style)",
             version_format: "v${raw}",
             style: "149 bold",
