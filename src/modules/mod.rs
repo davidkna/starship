@@ -101,6 +101,7 @@ mod vcsh;
 mod vlang;
 mod xmake;
 mod zig;
+mod custom_wasm;
 
 #[cfg(feature = "battery")]
 mod battery;
@@ -133,6 +134,7 @@ pub fn handle<'a>(module: &str, context: &'a Context) -> Option<Module<'a>> {
             "cobol" => cobol::module(context),
             "conda" => conda::module(context),
             "container" => container::module(context),
+            "custom_wasm" => custom_wasm::module(context),
             "cpp" => cpp::module(context),
             "daml" => daml::module(context),
             "dart" => dart::module(context),
