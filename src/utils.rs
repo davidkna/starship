@@ -577,48 +577,64 @@ CMake suite maintained and supported by Kitware (kitware.com/cmake).\n",
     Some(out)
 }
 
-/// Wraps ANSI color escape sequences in the shell-appropriate wrappers.
-pub fn wrap_colorseq_for_shell(ansi: String, shell: Shell) -> String {
-    const ESCAPE_BEGIN: char = '\u{1b}';
-    const ESCAPE_END: char = 'm';
-    wrap_seq_for_shell(ansi, shell, ESCAPE_BEGIN, ESCAPE_END)
-}
-
-/// Many shells cannot deal with raw unprintable characters and miscompute the cursor position,
-/// leading to strange visual bugs like duplicated/missing chars. This function wraps a specified
-/// sequence in shell-specific escapes to avoid these problems.
-pub fn wrap_seq_for_shell(
-    ansi: String,
-    shell: Shell,
-    escape_begin: char,
-    escape_end: char,
-) -> String {
+/// Wraps ANSI color escape sequences and OSC sequences in shell-appropriate wrappers.
+/// Handles both CSI sequences (ESC[...letter) and OSC sequences (ESC]...BEL or ESC]...ST).
+pub fn wrap_seq_for_shell(text: String, shell: Shell) -> String {
     let (beg, end) = match shell {
         // \[ and \]
-        Shell::Bash => ("\u{5c}\u{5b}", "\u{5c}\u{5d}"),
+        Shell::Bash => (b"\\[", b"\\]"),
         // %{ and %}
-        Shell::Tcsh | Shell::Zsh => ("\u{25}\u{7b}", "\u{25}\u{7d}"),
-        _ => return ansi,
+        Shell::Tcsh | Shell::Zsh => (b"%{", b"%}"),
+        _ => return text,
     };
 
-    // ANSI escape codes cannot be nested, so we can keep track of whether we're
-    // in an escape or not with a single boolean variable
-    let mut escaped = false;
-    let final_string: String = ansi
-        .chars()
-        .map(|x| {
-            if x == escape_begin && !escaped {
-                escaped = true;
-                format!("{beg}{escape_begin}")
-            } else if x == escape_end && escaped {
-                escaped = false;
-                format!("{escape_end}{end}")
+    let mut result = Vec::with_capacity(text.len());
+    let mut bytes = text.bytes().peekable();
+    let mut in_csi_seq = false;
+    let mut in_osc = false;
+
+    while let Some(byte) = bytes.next() {
+        if byte == b'\x1b' {
+            if let Some(&b']') = bytes.peek() {
+                // Start of OSC sequence (ESC])
+                in_osc = true;
+                result.extend_from_slice(beg);
+                result.push(byte);
+            } else if let Some(&b'\\') = bytes.peek() {
+                // ST terminator (ESC\) - end of OSC sequence
+                if in_osc {
+                    result.push(byte); // push the ESC
+                    result.push(bytes.next().unwrap()); // push the backslash
+                    result.extend_from_slice(end);
+                    in_osc = false;
+                } else {
+                    result.push(byte);
+                }
             } else {
-                x.to_string()
+                // Start of ANSI CSI sequence (ESC[...)
+                if !in_osc {
+                    in_csi_seq = true;
+                    result.extend_from_slice(beg);
+                }
+                result.push(byte);
             }
-        })
-        .collect();
-    final_string
+        } else if byte.is_ascii_alphabetic() && in_csi_seq {
+            // End of ANSI CSI sequence (final byte is alphabetic)
+            result.push(byte);
+            result.extend_from_slice(end);
+            in_csi_seq = false;
+        } else if byte == b'\x07' && in_osc {
+            // BEL terminator - end of OSC sequence
+            result.push(byte);
+            result.extend_from_slice(end);
+            in_osc = false;
+        } else {
+            result.push(byte);
+        }
+    }
+
+    // SAFETY: We only copied bytes from the original UTF-8 string and added ASCII wrapper bytes
+    unsafe { String::from_utf8_unchecked(result) }
 }
 
 fn internal_exec_cmd<T: AsRef<OsStr> + Debug, U: AsRef<OsStr> + Debug>(
@@ -932,40 +948,77 @@ mod tests {
 
     #[test]
     fn test_color_sequence_wrappers() {
-        let test0 = "\x1b2mhellomynamekeyes\x1b2m"; // BEGIN: \x1b     END: m
-        let test1 = "\x1b]330;mlol\x1b]0m"; // BEGIN: \x1b     END: m
-        let test2 = "\u{1b}J"; // BEGIN: \x1b     END: J
-        let test3 = "OH NO"; // BEGIN: O    END: O
-        let test4 = "herpaderp";
-        let test5 = "";
+        // Test basic color sequences (CSI ending with 'm')
+        let test0 = "\x1b[1;33mcolored\x1b[0m";
+        let zresult0 = wrap_seq_for_shell(test0.to_string(), Shell::Zsh);
+        assert_eq!(&zresult0, "%{\x1b[1;33m%}colored%{\x1b[0m%}");
+        let bresult0 = wrap_seq_for_shell(test0.to_string(), Shell::Bash);
+        assert_eq!(&bresult0, "\\[\x1b[1;33m\\]colored\\[\x1b[0m\\]");
 
-        let zresult0 = wrap_seq_for_shell(test0.to_string(), Shell::Zsh, '\x1b', 'm');
-        let zresult1 = wrap_seq_for_shell(test1.to_string(), Shell::Zsh, '\x1b', 'm');
-        let zresult2 = wrap_seq_for_shell(test2.to_string(), Shell::Zsh, '\x1b', 'J');
-        let zresult3 = wrap_seq_for_shell(test3.to_string(), Shell::Zsh, 'O', 'O');
-        let zresult4 = wrap_seq_for_shell(test4.to_string(), Shell::Zsh, '\x1b', 'm');
-        let zresult5 = wrap_seq_for_shell(test5.to_string(), Shell::Zsh, '\x1b', 'm');
+        // Test other CSI sequences (cursor movement, clear, etc.)
+        let test_clear = "text\x1b[2Jmore"; // Clear screen (CSI J)
+        let zresult_clear = wrap_seq_for_shell(test_clear.to_string(), Shell::Zsh);
+        assert_eq!(&zresult_clear, "text%{\x1b[2J%}more");
 
-        assert_eq!(&zresult0, "%{\x1b2m%}hellomynamekeyes%{\x1b2m%}");
-        assert_eq!(&zresult1, "%{\x1b]330;m%}lol%{\x1b]0m%}");
-        assert_eq!(&zresult2, "%{\x1bJ%}");
-        assert_eq!(&zresult3, "%{OH NO%}");
-        assert_eq!(&zresult4, "herpaderp");
-        assert_eq!(&zresult5, "");
+        let test_cursor = "pos\x1b[10;20Hafter"; // Cursor position (CSI H)
+        let bresult_cursor = wrap_seq_for_shell(test_cursor.to_string(), Shell::Bash);
+        assert_eq!(&bresult_cursor, "pos\\[\x1b[10;20H\\]after");
 
-        let bresult0 = wrap_seq_for_shell(test0.to_string(), Shell::Bash, '\x1b', 'm');
-        let bresult1 = wrap_seq_for_shell(test1.to_string(), Shell::Bash, '\x1b', 'm');
-        let bresult2 = wrap_seq_for_shell(test2.to_string(), Shell::Bash, '\x1b', 'J');
-        let bresult3 = wrap_seq_for_shell(test3.to_string(), Shell::Bash, 'O', 'O');
-        let bresult4 = wrap_seq_for_shell(test4.to_string(), Shell::Bash, '\x1b', 'm');
-        let bresult5 = wrap_seq_for_shell(test5.to_string(), Shell::Bash, '\x1b', 'm');
+        // Test plain text without escape sequences
+        let test1 = "herpaderp";
+        let zresult1 = wrap_seq_for_shell(test1.to_string(), Shell::Zsh);
+        assert_eq!(&zresult1, "herpaderp");
+        let bresult1 = wrap_seq_for_shell(test1.to_string(), Shell::Bash);
+        assert_eq!(&bresult1, "herpaderp");
 
-        assert_eq!(&bresult0, "\\[\x1b2m\\]hellomynamekeyes\\[\x1b2m\\]");
-        assert_eq!(&bresult1, "\\[\x1b]330;m\\]lol\\[\x1b]0m\\]");
-        assert_eq!(&bresult2, "\\[\x1bJ\\]");
-        assert_eq!(&bresult3, "\\[OH NO\\]");
-        assert_eq!(&bresult4, "herpaderp");
-        assert_eq!(&bresult5, "");
+        // Test empty string
+        let test2 = "";
+        let zresult2 = wrap_seq_for_shell(test2.to_string(), Shell::Zsh);
+        assert_eq!(&zresult2, "");
+        let bresult2 = wrap_seq_for_shell(test2.to_string(), Shell::Bash);
+        assert_eq!(&bresult2, "");
+
+        // Test Fish shell (should return unchanged)
+        let test3 = "\x1b[1;33mcolored\x1b[0m";
+        let fresult = wrap_seq_for_shell(test3.to_string(), Shell::Fish);
+        assert_eq!(&fresult, test3);
+    }
+
+    #[test]
+    fn test_osc_sequence_wrappers() {
+        // Test OSC 777 with ST terminator (ESC] ... ESC\)
+        let osc777 = "text\x1b]777;notify;Title;Body\x1b\\more";
+        let zsh_result = wrap_seq_for_shell(osc777.to_string(), Shell::Zsh);
+        assert_eq!(&zsh_result, "text%{\x1b]777;notify;Title;Body\x1b\\%}more");
+        let bash_result = wrap_seq_for_shell(osc777.to_string(), Shell::Bash);
+        assert_eq!(
+            &bash_result,
+            "text\\[\x1b]777;notify;Title;Body\x1b\\\\]more"
+        );
+
+        // Test OSC 9 with BEL terminator (ESC] ... BEL)
+        let osc9 = "start\x1b]9;notification\x07end";
+        let zsh_result = wrap_seq_for_shell(osc9.to_string(), Shell::Zsh);
+        assert_eq!(&zsh_result, "start%{\x1b]9;notification\x07%}end");
+        let bash_result = wrap_seq_for_shell(osc9.to_string(), Shell::Bash);
+        assert_eq!(&bash_result, "start\\[\x1b]9;notification\x07\\]end");
+
+        // Test mixed color sequences and OSC sequences
+        let mixed = "\x1b[1;33mcolored\x1b[0m\x1b]777;notify;Test;Message\x1b\\normal";
+        let zsh_result = wrap_seq_for_shell(mixed.to_string(), Shell::Zsh);
+        assert_eq!(
+            &zsh_result,
+            "%{\x1b[1;33m%}colored%{\x1b[0m%}%{\x1b]777;notify;Test;Message\x1b\\%}normal"
+        );
+        let bash_result = wrap_seq_for_shell(mixed.to_string(), Shell::Bash);
+        assert_eq!(
+            &bash_result,
+            "\\[\x1b[1;33m\\]colored\\[\x1b[0m\\]\\[\x1b]777;notify;Test;Message\x1b\\\\]normal"
+        );
+
+        // Test that other shells return unchanged
+        let fish_result = wrap_seq_for_shell(osc777.to_string(), Shell::Fish);
+        assert_eq!(&fish_result, osc777);
     }
 
     #[test]

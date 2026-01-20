@@ -212,6 +212,9 @@ where
                 current = Vec::new();
                 prev_style = None;
             }
+            Segment::Control(cs) => {
+                current.push(cs.ansi_string());
+            }
             _ => {
                 used += segment.width_graphemes();
                 let current_segment_string = segment.ansi_string(prev_style.as_ref());

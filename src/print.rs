@@ -20,7 +20,7 @@ use crate::module::Module;
 use crate::modules;
 use crate::segment::Segment;
 use crate::shadow;
-use crate::utils::wrap_colorseq_for_shell;
+use crate::utils::wrap_seq_for_shell;
 
 pub struct Grapheme<'a>(pub &'a str);
 
@@ -136,7 +136,7 @@ pub fn get_prompt(context: &Context) -> String {
     // AnsiStrings strips redundant ANSI color sequences, so apply it before modifying the ANSI
     // color sequences for this specific shell
     let shell_wrapped_output =
-        wrap_colorseq_for_shell(AnsiStrings(&module_strings).to_string(), context.shell);
+        wrap_seq_for_shell(AnsiStrings(&module_strings).to_string(), context.shell);
     write!(buf, "{shell_wrapped_output}").unwrap();
 
     if context.target == Target::Right {
