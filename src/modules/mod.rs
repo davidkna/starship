@@ -115,115 +115,126 @@ use crate::context::{Context, Detected, Shell};
 use crate::module::Module;
 use std::time::Instant;
 
-pub fn handle<'a>(module: &str, context: &'a Context) -> Option<Module<'a>> {
+fn get_module_name<'a>(instance_name: &'a str, context: &'a Context) -> &'a str {
+    context
+        .config
+        .get_module_config(instance_name)
+        .and_then(|c| c.get("module"))
+        .and_then(|v| v.as_str())
+        .unwrap_or(instance_name)
+}
+
+pub fn handle<'a>(instance_name: &str, context: &'a Context) -> Option<Module<'a>> {
+    let module_name = get_module_name(instance_name, context);
+
     let start: Instant = Instant::now();
     let mut m: Option<Module> = {
-        match module {
+        match module_name {
             // Keep these ordered alphabetically.
             // Default ordering is handled in configs/starship_root.rs
-            "aws" => aws::module(context),
-            "azure" => azure::module(context),
+            "aws" => aws::module(context, Some(instance_name)),
+            "azure" => azure::module(context, Some(instance_name)),
             #[cfg(feature = "battery")]
-            "battery" => battery::module(context),
-            "buf" => buf::module(context),
-            "bun" => bun::module(context),
-            "c" => c::module(context),
-            "character" => character::module(context),
-            "cmake" => cmake::module(context),
-            "cmd_duration" => cmd_duration::module(context),
-            "cobol" => cobol::module(context),
-            "conda" => conda::module(context),
-            "container" => container::module(context),
-            "cpp" => cpp::module(context),
-            "daml" => daml::module(context),
-            "dart" => dart::module(context),
-            "deno" => deno::module(context),
-            "directory" => directory::module(context),
-            "direnv" => direnv::module(context),
-            "docker_context" => docker_context::module(context),
-            "dotnet" => dotnet::module(context),
-            "elixir" => elixir::module(context),
-            "elm" => elm::module(context),
-            "erlang" => erlang::module(context),
+            "battery" => battery::module(context, Some(instance_name)),
+            "buf" => buf::module(context, Some(instance_name)),
+            "bun" => bun::module(context, Some(instance_name)),
+            "c" => c::module(context, Some(instance_name)),
+            "character" => character::module(context, Some(instance_name)),
+            "cmake" => cmake::module(context, Some(instance_name)),
+            "cmd_duration" => cmd_duration::module(context, Some(instance_name)),
+            "cobol" => cobol::module(context, Some(instance_name)),
+            "conda" => conda::module(context, Some(instance_name)),
+            "container" => container::module(context, Some(instance_name)),
+            "cpp" => cpp::module(context, Some(instance_name)),
+            "daml" => daml::module(context, Some(instance_name)),
+            "dart" => dart::module(context, Some(instance_name)),
+            "deno" => deno::module(context, Some(instance_name)),
+            "directory" => directory::module(context, Some(instance_name)),
+            "direnv" => direnv::module(context, Some(instance_name)),
+            "docker_context" => docker_context::module(context, Some(instance_name)),
+            "dotnet" => dotnet::module(context, Some(instance_name)),
+            "elixir" => elixir::module(context, Some(instance_name)),
+            "elm" => elm::module(context, Some(instance_name)),
+            "erlang" => erlang::module(context, Some(instance_name)),
             "env_var" => env_var::module(None, context),
-            "fennel" => fennel::module(context),
-            "fill" => fill::module(context),
-            "fortran" => fortran::module(context),
-            "fossil_branch" => fossil_branch::module(context),
-            "fossil_metrics" => fossil_metrics::module(context),
-            "gcloud" => gcloud::module(context),
-            "git_branch" => git_branch::module(context),
-            "git_commit" => git_commit::module(context),
-            "git_metrics" => git_metrics::module(context),
-            "git_state" => git_state::module(context),
-            "git_status" => git_status::module(context),
-            "gleam" => gleam::module(context),
-            "golang" => golang::module(context),
-            "gradle" => gradle::module(context),
-            "guix_shell" => guix_shell::module(context),
-            "haskell" => haskell::module(context),
-            "haxe" => haxe::module(context),
-            "helm" => helm::module(context),
-            "hg_branch" => hg_branch::module(context),
-            "hg_state" => hg_state::module(context),
-            "hostname" => hostname::module(context),
-            "java" => java::module(context),
-            "jobs" => jobs::module(context),
-            "julia" => julia::module(context),
-            "kotlin" => kotlin::module(context),
-            "kubernetes" => kubernetes::module(context),
-            "line_break" => line_break::module(context),
-            "localip" => localip::module(context),
-            "lua" => lua::module(context),
-            "maven" => maven::module(context),
-            "memory_usage" => memory_usage::module(context),
-            "meson" => meson::module(context),
-            "mise" => mise::module(context),
-            "mojo" => mojo::module(context),
-            "nats" => nats::module(context),
-            "netns" => netns::module(context),
-            "nim" => nim::module(context),
-            "nix_shell" => nix_shell::module(context),
-            "nodejs" => nodejs::module(context),
-            "ocaml" => ocaml::module(context),
-            "odin" => odin::module(context),
-            "opa" => opa::module(context),
-            "openstack" => openstack::module(context),
-            "os" => os::module(context),
-            "package" => package::module(context),
-            "perl" => perl::module(context),
-            "php" => php::module(context),
-            "pijul_channel" => pijul_channel::module(context),
-            "pixi" => pixi::module(context),
-            "pulumi" => pulumi::module(context),
-            "purescript" => purescript::module(context),
-            "python" => python::module(context),
-            "quarto" => quarto::module(context),
-            "raku" => raku::module(context),
-            "rlang" => rlang::module(context),
-            "red" => red::module(context),
-            "ruby" => ruby::module(context),
-            "rust" => rust::module(context),
-            "scala" => scala::module(context),
-            "shell" => shell::module(context),
-            "shlvl" => shlvl::module(context),
-            "singularity" => singularity::module(context),
-            "solidity" => solidity::module(context),
-            "spack" => spack::module(context),
-            "swift" => swift::module(context),
-            "status" => status::module(context),
-            "sudo" => sudo::module(context),
-            "terraform" => terraform::module(context),
-            "time" => time::module(context),
-            "typst" => typst::module(context),
-            "crystal" => crystal::module(context),
-            "username" => username::module(context),
-            "vlang" => vlang::module(context),
-            "vagrant" => vagrant::module(context),
-            "vcs" => vcs::module(context),
-            "vcsh" => vcsh::module(context),
-            "xmake" => xmake::module(context),
-            "zig" => zig::module(context),
+            "fennel" => fennel::module(context, Some(instance_name)),
+            "fill" => fill::module(context, Some(instance_name)),
+            "fortran" => fortran::module(context, Some(instance_name)),
+            "fossil_branch" => fossil_branch::module(context, Some(instance_name)),
+            "fossil_metrics" => fossil_metrics::module(context, Some(instance_name)),
+            "gcloud" => gcloud::module(context, Some(instance_name)),
+            "git_branch" => git_branch::module(context, Some(instance_name)),
+            "git_commit" => git_commit::module(context, Some(instance_name)),
+            "git_metrics" => git_metrics::module(context, Some(instance_name)),
+            "git_state" => git_state::module(context, Some(instance_name)),
+            "git_status" => git_status::module(context, Some(instance_name)),
+            "gleam" => gleam::module(context, Some(instance_name)),
+            "golang" => golang::module(context, Some(instance_name)),
+            "gradle" => gradle::module(context, Some(instance_name)),
+            "guix_shell" => guix_shell::module(context, Some(instance_name)),
+            "haskell" => haskell::module(context, Some(instance_name)),
+            "haxe" => haxe::module(context, Some(instance_name)),
+            "helm" => helm::module(context, Some(instance_name)),
+            "hg_branch" => hg_branch::module(context, Some(instance_name)),
+            "hg_state" => hg_state::module(context, Some(instance_name)),
+            "hostname" => hostname::module(context, Some(instance_name)),
+            "java" => java::module(context, Some(instance_name)),
+            "jobs" => jobs::module(context, Some(instance_name)),
+            "julia" => julia::module(context, Some(instance_name)),
+            "kotlin" => kotlin::module(context, Some(instance_name)),
+            "kubernetes" => kubernetes::module(context, Some(instance_name)),
+            "line_break" => line_break::module(context, Some(instance_name)),
+            "localip" => localip::module(context, Some(instance_name)),
+            "lua" => lua::module(context, Some(instance_name)),
+            "maven" => maven::module(context, Some(instance_name)),
+            "memory_usage" => memory_usage::module(context, Some(instance_name)),
+            "meson" => meson::module(context, Some(instance_name)),
+            "mise" => mise::module(context, Some(instance_name)),
+            "mojo" => mojo::module(context, Some(instance_name)),
+            "nats" => nats::module(context, Some(instance_name)),
+            "netns" => netns::module(context, Some(instance_name)),
+            "nim" => nim::module(context, Some(instance_name)),
+            "nix_shell" => nix_shell::module(context, Some(instance_name)),
+            "nodejs" => nodejs::module(context, Some(instance_name)),
+            "ocaml" => ocaml::module(context, Some(instance_name)),
+            "odin" => odin::module(context, Some(instance_name)),
+            "opa" => opa::module(context, Some(instance_name)),
+            "openstack" => openstack::module(context, Some(instance_name)),
+            "os" => os::module(context, Some(instance_name)),
+            "package" => package::module(context, Some(instance_name)),
+            "perl" => perl::module(context, Some(instance_name)),
+            "php" => php::module(context, Some(instance_name)),
+            "pijul_channel" => pijul_channel::module(context, Some(instance_name)),
+            "pixi" => pixi::module(context, Some(instance_name)),
+            "pulumi" => pulumi::module(context, Some(instance_name)),
+            "purescript" => purescript::module(context, Some(instance_name)),
+            "python" => python::module(context, Some(instance_name)),
+            "quarto" => quarto::module(context, Some(instance_name)),
+            "raku" => raku::module(context, Some(instance_name)),
+            "rlang" => rlang::module(context, Some(instance_name)),
+            "red" => red::module(context, Some(instance_name)),
+            "ruby" => ruby::module(context, Some(instance_name)),
+            "rust" => rust::module(context, Some(instance_name)),
+            "scala" => scala::module(context, Some(instance_name)),
+            "shell" => shell::module(context, Some(instance_name)),
+            "shlvl" => shlvl::module(context, Some(instance_name)),
+            "singularity" => singularity::module(context, Some(instance_name)),
+            "solidity" => solidity::module(context, Some(instance_name)),
+            "spack" => spack::module(context, Some(instance_name)),
+            "swift" => swift::module(context, Some(instance_name)),
+            "status" => status::module(context, Some(instance_name)),
+            "sudo" => sudo::module(context, Some(instance_name)),
+            "terraform" => terraform::module(context, Some(instance_name)),
+            "time" => time::module(context, Some(instance_name)),
+            "typst" => typst::module(context, Some(instance_name)),
+            "crystal" => crystal::module(context, Some(instance_name)),
+            "username" => username::module(context, Some(instance_name)),
+            "vlang" => vlang::module(context, Some(instance_name)),
+            "vagrant" => vagrant::module(context, Some(instance_name)),
+            "vcs" => vcs::module(context, Some(instance_name)),
+            "vcsh" => vcsh::module(context, Some(instance_name)),
+            "xmake" => xmake::module(context, Some(instance_name)),
+            "zig" => zig::module(context, Some(instance_name)),
             env if env.starts_with("env_var.") => {
                 env_var::module(env.strip_prefix("env_var."), context)
             }
@@ -233,7 +244,7 @@ pub fn handle<'a>(module: &str, context: &'a Context) -> Option<Module<'a>> {
             }
             _ => {
                 eprintln!(
-                    "Error: Unknown module {module}. Use starship module --list to list out all supported modules."
+                    "Error: Unknown module {instance_name}. Use starship module --list to list out all supported modules."
                 );
                 None
             }
@@ -241,13 +252,14 @@ pub fn handle<'a>(module: &str, context: &'a Context) -> Option<Module<'a>> {
     };
 
     let elapsed = start.elapsed();
-    log::trace!("Took {elapsed:?} to compute module {module:?}");
+    log::trace!("Took {elapsed:?} to compute module {instance_name:?}");
     if elapsed.as_millis() >= 1 {
         // If we take less than 1ms to compute a None, then we will not return a module at all
         // if we have a module: default duration is 0 so no need to change it
         // if we took more than 1ms we want to report that and so--in case we have None currently--
         // need to create an empty module just to hold the duration for that case
-        m.get_or_insert_with(|| context.new_module(module)).duration = elapsed;
+        m.get_or_insert_with(|| context.new_module(module_name, Some(instance_name)))
+            .duration = elapsed;
     }
     m
 }
@@ -376,5 +388,30 @@ mod test {
             println!("Checking if {module:?} has a description");
             assert_ne!(description(module), "<no description>");
         }
+    }
+
+    #[test]
+    fn test_alias_module() {
+        use crate::test::ModuleRenderer;
+        use nu_ansi_term::Color;
+
+        let actual = ModuleRenderer::new("work_aws")
+            .config(toml::toml! {
+                [work_aws]
+                module = "aws"
+                symbol = "WorkAWS "
+                [work_aws.profile_aliases]
+                work-profile = "work"
+            })
+            .env("AWS_PROFILE", "work-profile")
+            .env("AWS_ACCESS_KEY_ID", "dummy")
+            .collect();
+
+        let expected = Some(format!(
+            "on {}",
+            Color::Yellow.bold().paint("WorkAWS work ")
+        ));
+
+        assert_eq!(expected, actual);
     }
 }

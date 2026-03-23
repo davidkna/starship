@@ -14,8 +14,8 @@ use crate::{
 
 /// Creates a module with the current added/deleted lines in the git repository at the
 /// current directory
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("git_metrics");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("git_metrics", instance_name);
     let config: GitMetricsConfig = GitMetricsConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,
@@ -29,7 +29,7 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
     if gix_repo.is_bare() {
         return None;
     }
-    let status_module = context.new_module("git_status");
+    let status_module = context.new_module("git_status", instance_name);
     let status_config = GitStatusConfig::try_load(status_module.config);
     // TODO: remove this special case once `gitoxide` can handle sparse indices for tree-index comparisons.
     let stats = if repo.fs_monitor_value_is_true

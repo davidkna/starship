@@ -5,8 +5,8 @@ use crate::formatter::StringFormatter;
 use crate::formatter::VersionFormatter;
 
 /// Creates a module with the current Helm version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("helm");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("helm", instance_name);
     let config = HelmConfig::try_load(module.config);
 
     let is_helm_project = context

@@ -32,8 +32,8 @@ use crate::formatter::StringFormatter;
 ///
 /// **Truncation**
 /// Paths will be limited in length to `3` path components by default.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("directory");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("directory", instance_name);
     let config: DirectoryConfig = DirectoryConfig::try_load(module.config);
 
     let home_dir = context

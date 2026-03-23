@@ -10,8 +10,8 @@ use crate::{
 
 use super::{Context, Module};
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("fortran");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("fortran", instance_name);
     let config = FortranConfig::try_load(module.config);
 
     let is_fortran_project = context

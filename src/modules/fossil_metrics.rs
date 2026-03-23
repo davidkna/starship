@@ -7,8 +7,8 @@ use crate::formatter::StringFormatter;
 
 /// Creates a module with currently added/deleted lines in the Fossil check-out in the current
 /// directory.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("fossil_metrics");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("fossil_metrics", instance_name);
     let config = FossilMetricsConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

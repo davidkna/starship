@@ -51,10 +51,11 @@ impl<'a, T: Deserialize<'a> + Default> ModuleConfig<'a, ValueError> for T {
         let config = config.into();
         let deserializer = ValueDeserializer::new(config);
         T::deserialize(deserializer).or_else(|err| {
-            // If the error is an unrecognized key, print a warning and run
             // deserialize ignoring that error. Otherwise, just return the error
             if err.to_string().contains("Unknown key") {
-                log::warn!("{err}");
+                if !err.to_string().contains("key `module`") {
+                    log::warn!("{err}");
+                }
                 let deserializer2 = ValueDeserializer::new(config).with_allow_unknown_keys();
                 T::deserialize(deserializer2)
             } else {

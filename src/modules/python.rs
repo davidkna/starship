@@ -8,8 +8,8 @@ use crate::formatter::VersionFormatter;
 use crate::utils::get_command_string_output;
 
 /// Creates a module with the current Python version and, if active, virtual environment.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("python");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("python", instance_name);
     let config: PythonConfig = PythonConfig::try_load(module.config);
 
     let is_py_project = context

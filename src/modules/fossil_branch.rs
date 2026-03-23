@@ -7,8 +7,8 @@ use crate::modules::utils::truncate::truncate_text;
 /// Creates a module with the Fossil branch of the check-out in the current directory
 ///
 /// Will display the branch name if the current directory is a Fossil check-out
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("fossil_branch");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("fossil_branch", instance_name);
     let config = FossilBranchConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

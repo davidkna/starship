@@ -5,8 +5,8 @@ use crate::formatter::StringFormatter;
 use crate::formatter::VersionFormatter;
 
 /// Creates a module with the current Swift version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("swift");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("swift", instance_name);
     let config: SwiftConfig = SwiftConfig::try_load(module.config);
 
     let is_swift_project = context

@@ -5,8 +5,8 @@ use crate::formatter::StringFormatter;
 use crate::formatter::VersionFormatter;
 
 /// Creates a module with the current PureScript version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("purescript");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("purescript", instance_name);
     let config: PureScriptConfig = PureScriptConfig::try_load(module.config);
     let is_purs_project = context
         .try_begin_scan()?

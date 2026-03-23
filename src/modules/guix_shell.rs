@@ -7,8 +7,8 @@ use crate::formatter::StringFormatter;
 ///
 /// The module will use the `$GUIX_ENVIRONMENT` environment variable to determine if it's
 /// inside a guix-shell and the name of it.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("guix_shell");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("guix_shell", instance_name);
     let config: GuixShellConfig = GuixShellConfig::try_load(module.config);
 
     let is_guix_shell = context.get_env("GUIX_ENVIRONMENT").is_some();

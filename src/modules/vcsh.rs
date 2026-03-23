@@ -7,13 +7,13 @@ use crate::formatter::StringFormatter;
 /// Creates a module that displays VCSH repository currently in use
 ///
 /// Will display the name of the current VCSH repository if one is active.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     let repo = context.get_env("VCSH_REPO_NAME").unwrap_or_default();
     if repo.trim().is_empty() {
         return None;
     }
 
-    let mut module = context.new_module("vcsh");
+    let mut module = context.new_module("vcsh", instance_name);
     let config: VcshConfig = VcshConfig::try_load(module.config);
 
     let parsed = StringFormatter::new(config.format).and_then(|formatter| {

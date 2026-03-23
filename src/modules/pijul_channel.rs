@@ -7,8 +7,8 @@ use crate::formatter::StringFormatter;
 /// Creates a module with the Pijul channel in the current directory
 ///
 /// Will display the channel lame if the current directory is a pijul repo
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("pijul_channel");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("pijul_channel", instance_name);
     let config: PijulConfig = PijulConfig::try_load(module.config);
 
     // We default to disabled=true, so we have to check after loading our config module.

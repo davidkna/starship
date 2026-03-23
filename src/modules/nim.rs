@@ -5,8 +5,8 @@ use crate::formatter::StringFormatter;
 use crate::formatter::VersionFormatter;
 
 /// Creates a module with the current Nim version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("nim");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("nim", instance_name);
     let config = NimConfig::try_load(module.config);
     let is_nim_project = context
         .try_begin_scan()?

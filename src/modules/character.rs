@@ -10,7 +10,7 @@ use crate::formatter::StringFormatter;
 ///   (green arrow by default)
 /// - If the exit-code was anything else, it will be formatted with
 ///   `error_symbol` (red arrow by default)
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     enum ShellEditMode {
         Normal,
         Visual,
@@ -21,7 +21,7 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
     const ASSUMED_MODE: ShellEditMode = ShellEditMode::Insert;
     // TODO: extend config to more modes
 
-    let mut module = context.new_module("character");
+    let mut module = context.new_module("character", instance_name);
     let config: CharacterConfig = CharacterConfig::try_load(module.config);
 
     let props = &context.properties;

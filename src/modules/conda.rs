@@ -7,14 +7,14 @@ use crate::formatter::StringFormatter;
 /// Creates a module with the current Conda environment
 ///
 /// Will display the Conda environment iff `$CONDA_DEFAULT_ENV` is set.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     // Reference implementation: https://github.com/denysdovhan/spaceship-prompt/blob/master/sections/conda.zsh
     let conda_env = context.get_env("CONDA_DEFAULT_ENV").unwrap_or_default();
     if conda_env.trim().is_empty() {
         return None;
     }
 
-    let mut module = context.new_module("conda");
+    let mut module = context.new_module("conda", instance_name);
     let config: CondaConfig = CondaConfig::try_load(module.config);
 
     if config.ignore_base && conda_env == "base" {

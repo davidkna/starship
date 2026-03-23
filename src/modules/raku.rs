@@ -7,8 +7,8 @@ use std::ops::Deref;
 use std::sync::LazyLock;
 
 /// Creates a module with the current raku version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("raku");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("raku", instance_name);
     let config: RakuConfig = RakuConfig::try_load(module.config);
     let is_raku_project = context
         .try_begin_scan()?

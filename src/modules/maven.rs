@@ -9,8 +9,8 @@ use crate::{
     utils,
 };
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("maven");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("maven", instance_name);
     let config = MavenConfig::try_load(module.config);
     let is_maven_project = context
         .try_begin_scan()?

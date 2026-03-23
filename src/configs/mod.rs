@@ -116,6 +116,20 @@ pub use starship_root::*;
     schemars(deny_unknown_fields)
 )]
 #[serde(default)]
+struct ModuleInstanceConfig<'a> {
+    #[serde(borrow)]
+    module: &'a str,
+    #[serde(flatten)]
+    extra: IndexMap<String, toml::Value>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Default)]
+#[cfg_attr(
+    feature = "config-schema",
+    derive(schemars::JsonSchema),
+    schemars(deny_unknown_fields)
+)]
+#[serde(default)]
 pub struct FullConfig<'a> {
     // Meta
     #[serde(rename = "$schema")]
@@ -329,11 +343,14 @@ pub struct FullConfig<'a> {
     zig: zig::ZigConfig<'a>,
     #[serde(borrow)]
     custom: IndexMap<String, custom::CustomConfig<'a>>,
+    #[serde(borrow, flatten)]
+    module_instances: IndexMap<String, ModuleInstanceConfig<'a>>,
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::config::ModuleConfig;
     use crate::module::ALL_MODULES;
     use toml::value::Value;
 
@@ -344,5 +361,27 @@ mod test {
         for module in ALL_MODULES {
             assert!(cfg_table.contains_key(*module));
         }
+    }
+
+    #[test]
+    fn test_full_config_keeps_module_instances() {
+        let user_config = toml::toml! {
+            [work_aws]
+            module = "aws"
+            symbol = "WorkAWS "
+        };
+
+        let loaded = FullConfig::load(&user_config);
+        let loaded = Value::try_from(loaded).unwrap();
+        let cfg_table = loaded.as_table().unwrap();
+
+        assert!(cfg_table.contains_key("work_aws"));
+        assert_eq!(
+            cfg_table
+                .get("work_aws")
+                .and_then(|v| v.get("module"))
+                .and_then(Value::as_str),
+            Some("aws")
+        );
     }
 }

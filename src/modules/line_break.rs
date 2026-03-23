@@ -2,8 +2,8 @@ use super::{Context, Module};
 use crate::segment::Segment;
 
 /// Creates a module for the line break
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("line_break");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("line_break", instance_name);
 
     module.set_segments(vec![Segment::LineTerm]);
 

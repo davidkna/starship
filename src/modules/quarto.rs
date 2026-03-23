@@ -4,8 +4,8 @@ use crate::configs::quarto::QuartoConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 
 /// Creates a module with the current Quarto version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("quarto");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("quarto", instance_name);
     let config = QuartoConfig::try_load(module.config);
 
     let is_quarto_project = context

@@ -26,8 +26,8 @@ fn get_local_ipv4() -> Result<String, Error> {
 /// Will display the ip if all of the following criteria are met:
 ///     - `localip.disabled` is false
 ///     - `localip.ssh_only` is false OR the user is currently connected as an SSH session (`$SSH_CONNECTION`)
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("localip");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("localip", instance_name);
     let config: LocalipConfig = LocalipConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

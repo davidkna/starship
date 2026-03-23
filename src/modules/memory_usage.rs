@@ -42,8 +42,8 @@ fn format_usage_total(total: ByteSize, free: ByteSize) -> String {
 }
 
 /// Creates a module with system memory usage information
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("memory_usage");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("memory_usage", instance_name);
     let config = MemoryConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

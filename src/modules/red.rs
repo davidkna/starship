@@ -4,8 +4,8 @@ use crate::configs::red::RedConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 
 /// Creates a module with the current  Red version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("red");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("red", instance_name);
     let config = RedConfig::try_load(module.config);
     let is_red_project = context
         .try_begin_scan()?

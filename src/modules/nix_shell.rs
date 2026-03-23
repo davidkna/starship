@@ -57,8 +57,8 @@ impl NixShellType {
 ///     - impure         // $name == "" in an impure nix-shell
 ///     - unknown (name) // $name == "name" in an unknown nix-shell
 ///     - unknown        // $name == "" in an unknown nix-shell
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("nix_shell");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("nix_shell", instance_name);
     let config: NixShellConfig = NixShellConfig::try_load(module.config);
 
     let shell_name = context.get_env("name");

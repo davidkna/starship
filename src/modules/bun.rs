@@ -6,8 +6,8 @@ use crate::formatter::VersionFormatter;
 use crate::utils::get_command_string_output;
 
 /// Creates a module with the current Bun version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("bun");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("bun", instance_name);
     let config = BunConfig::try_load(module.config);
 
     let is_bun_project = context

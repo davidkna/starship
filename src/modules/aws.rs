@@ -261,8 +261,8 @@ fn has_source_profile(
     Some(has_credential_process || has_credentials)
 }
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("aws");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("aws", instance_name);
     let config: AwsConfig = AwsConfig::try_load(module.config);
 
     let aws_config = OnceCell::new();

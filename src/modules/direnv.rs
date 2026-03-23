@@ -10,8 +10,8 @@ use crate::formatter::StringFormatter;
 use serde::Deserialize;
 
 /// Creates a module with the current direnv rc
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("direnv");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("direnv", instance_name);
     let config = DirenvConfig::try_load(module.config);
     let has_detected_env_var = context.detect_env_vars(&config.detect_env_vars);
 

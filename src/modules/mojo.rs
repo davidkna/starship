@@ -6,8 +6,8 @@ use crate::formatter::StringFormatter;
 use std::sync::LazyLock;
 
 /// Creates a module with the current Mojo version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("mojo");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("mojo", instance_name);
     let config = MojoConfig::try_load(module.config);
 
     let is_mojo_project = context

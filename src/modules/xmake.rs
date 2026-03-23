@@ -4,8 +4,8 @@ use crate::configs::xmake::XMakeConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 
 /// Creates a module with the current `XMake` version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("xmake");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("xmake", instance_name);
     let config = XMakeConfig::try_load(module.config);
 
     let is_xmake_project = context

@@ -15,8 +15,8 @@ enum SwitchType {
 type OpamSwitch = (SwitchType, String);
 
 /// Creates a module with the current OCaml version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("ocaml");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("ocaml", instance_name);
     let config: OCamlConfig = OCamlConfig::try_load(module.config);
     let is_ocaml_project = context
         .try_begin_scan()?

@@ -333,7 +333,7 @@ fn handle_module<'a>(
 ) -> Vec<Module<'a>> {
     let mut modules: Vec<Module> = Vec::new();
 
-    if ALL_MODULES.contains(&module) {
+    if ALL_MODULES.contains(&module) || is_configured_module_instance(module, context) {
         // Write out a module if it isn't disabled
         if !context.is_module_disabled_in_config(module) {
             modules.extend(modules::handle(module, context));
@@ -377,6 +377,20 @@ fn handle_module<'a>(
     }
 
     modules
+}
+
+fn is_configured_module_instance(module: &str, context: &Context) -> bool {
+    context
+        .config
+        .get_module_config(module)
+        .and_then(|config| config.get("module"))
+        .and_then(|module_name| module_name.as_str())
+        .is_some_and(|module_name| {
+            ALL_MODULES.contains(&module_name)
+                || module_name.starts_with("env_var.")
+                || module_name.starts_with("custom.")
+                || matches!(module_name, "env_var" | "custom")
+        })
 }
 
 fn should_add_implicit_module(
@@ -539,6 +553,7 @@ fn preset_list() -> String {
 #[cfg(test)]
 mod test {
     use super::*;
+    use nu_ansi_term::Color;
     use crate::test::default_context;
     use crate::utils;
 
@@ -811,5 +826,27 @@ mod test {
         let actual = get_prompt(&context);
         assert_eq!(expected, actual);
         dir.close()
+    }
+
+    #[test]
+    fn aliased_module_in_format() {
+        let mut context = default_context().set_config(toml::toml! {
+                add_newline = false
+                format = "$work_aws"
+                [work_aws]
+                module = "aws"
+                symbol = "WorkAWS "
+                [work_aws.profile_aliases]
+                work-profile = "work"
+        });
+        context.env.insert("AWS_PROFILE", "work-profile".to_string());
+        context.env.insert("AWS_ACCESS_KEY_ID", "dummy".to_string());
+
+        let expected = Some(format!("on {}", Color::Yellow.bold().paint("WorkAWS work ")));
+        let actual = compute_modules(&context)
+            .into_iter()
+            .find(|module| !module.is_empty())
+            .map(|module| module.to_string());
+        assert_eq!(expected, actual);
     }
 }

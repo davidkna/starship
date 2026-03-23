@@ -1,12 +1,12 @@
 use super::{Context, Module};
 
 #[cfg(not(target_os = "linux"))]
-pub fn module<'a>(_context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(_context: &'a Context, _instance_name: Option<&str>) -> Option<Module<'a>> {
     None
 }
 
 #[cfg(target_os = "linux")]
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     use super::ModuleConfig;
     use crate::configs::container::ContainerConfig;
     use crate::formatter::StringFormatter;
@@ -76,7 +76,7 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
         None
     }
 
-    let mut module = context.new_module("container");
+    let mut module = context.new_module("container", instance_name);
     let config: ContainerConfig = ContainerConfig::try_load(module.config);
 
     if config.disabled {

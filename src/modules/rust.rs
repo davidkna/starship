@@ -156,8 +156,8 @@ impl RustToolingEnvironmentInfo {
 }
 
 /// Creates a module with the current Rust version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("rust");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("rust", instance_name);
     let config = RustConfig::try_load(module.config);
 
     let is_rs_project = context

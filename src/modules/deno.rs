@@ -5,8 +5,8 @@ use crate::formatter::StringFormatter;
 use crate::formatter::VersionFormatter;
 
 /// Creates a module with the current Deno version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("deno");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("deno", instance_name);
     let config = DenoConfig::try_load(module.config);
     let is_deno_project = context
         .try_begin_scan()?

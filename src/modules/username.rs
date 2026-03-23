@@ -18,7 +18,7 @@ const USERNAME_ENV_VAR: &str = "USERNAME";
 ///     - The option `username.detect_env_vars` is set with a not negated environment variable [4]
 /// Does not display the username:
 ///     - If the option `username.detect_env_vars` is set with a negated environment variable [A]
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     #[cfg(not(any(test, target_os = "android")))]
     let mut username = whoami::username()
         .inspect_err(|e| log::debug!("Failed to get username {e:?}"))
@@ -28,7 +28,7 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
     #[cfg(any(test, target_os = "android"))]
     let mut username = context.get_env(USERNAME_ENV_VAR)?;
 
-    let mut module = context.new_module("username");
+    let mut module = context.new_module("username", instance_name);
     let config: UsernameConfig = UsernameConfig::try_load(module.config);
     let has_detected_env_var = context.detect_env_vars2(&config.detect_env_vars);
 

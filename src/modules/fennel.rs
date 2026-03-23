@@ -4,8 +4,8 @@ use crate::configs::fennel::FennelConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 use crate::utils::get_command_string_output;
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("fennel");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("fennel", instance_name);
     let config = FennelConfig::try_load(module.config);
 
     let is_fnl_project = context

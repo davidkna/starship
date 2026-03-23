@@ -4,8 +4,8 @@ use serde_json as json;
 use crate::configs::nats::NatsConfig;
 use crate::formatter::StringFormatter;
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("nats");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("nats", instance_name);
     let config = NatsConfig::try_load(module.config);
 
     if config.disabled {

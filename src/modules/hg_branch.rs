@@ -11,8 +11,8 @@ use crate::utils::read_file;
 /// Creates a module with the Hg bookmark or branch in the current directory
 ///
 /// Will display the bookmark or branch name if the current directory is an hg repo
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("hg_branch");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("hg_branch", instance_name);
     let config: HgBranchConfig = HgBranchConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

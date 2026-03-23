@@ -8,8 +8,8 @@ use std::ops::Deref;
 use std::sync::LazyLock;
 
 /// Create a module with the current Elixir version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("elixir");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("elixir", instance_name);
     let config = ElixirConfig::try_load(module.config);
 
     let is_elixir_project = context

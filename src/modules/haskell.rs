@@ -4,8 +4,8 @@ use crate::configs::haskell::HaskellConfig;
 use crate::formatter::StringFormatter;
 
 /// Creates a module with the current Haskell version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("haskell");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("haskell", instance_name);
     let config = HaskellConfig::try_load(module.config);
 
     let is_hs_project = context

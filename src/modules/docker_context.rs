@@ -19,8 +19,8 @@ use crate::utils;
 ///     - `DOCKER_HOST`, `DOCKER_CONTEXT`, $HOME/.docker/config.json, $`DOCKER_CONFIG/config.json`
 ///     - (This is the same order docker follows, as `DOCKER_HOST` and `DOCKER_CONTEXT` override the
 ///     config)
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("docker_context");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("docker_context", instance_name);
     let config: DockerContextConfig = DockerContextConfig::try_load(module.config);
 
     if config.only_with_files

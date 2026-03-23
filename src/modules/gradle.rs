@@ -9,8 +9,8 @@ use crate::{
     utils,
 };
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("gradle");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("gradle", instance_name);
     let config = GradleConfig::try_load(module.config);
     let is_gradle_project = context
         .try_begin_scan()?

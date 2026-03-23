@@ -9,8 +9,8 @@ use crate::formatter::StringFormatter;
 /// Creates a module with the state of hg repository at the current directory
 ///
 /// During a mercurial operation it will show: MERGING, REBASING, UPDATING etc.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("hg_state");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("hg_state", instance_name);
     let config: HgStateConfig = HgStateConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

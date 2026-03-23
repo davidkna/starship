@@ -4,8 +4,8 @@ use crate::configs::os::OSConfig;
 use crate::formatter::StringFormatter;
 
 /// Creates a module with the current operating system
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("os");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("os", instance_name);
     let config: OSConfig = OSConfig::try_load(module.config);
 
     if config.disabled {

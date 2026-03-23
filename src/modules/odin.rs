@@ -4,8 +4,8 @@ use crate::configs::odin::OdinConfig;
 use crate::formatter::StringFormatter;
 
 /// Creates a module with the current Odin version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("odin");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("odin", instance_name);
     let config = OdinConfig::try_load(module.config);
 
     let is_odin_project = context

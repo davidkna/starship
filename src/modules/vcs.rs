@@ -7,8 +7,8 @@ use crate::configs::vcs::VcsConfig;
 use crate::formatter::StringFormatter;
 use crate::formatter::string_formatter::StringFormatterError;
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("vcs");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("vcs", instance_name);
     let config = VcsConfig::try_load(module.config);
 
     if config.disabled || config.order.is_empty() {

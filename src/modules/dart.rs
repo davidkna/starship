@@ -6,8 +6,8 @@ use crate::formatter::VersionFormatter;
 use crate::utils::get_command_string_output;
 
 /// Creates a module with the current Dart version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("dart");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("dart", instance_name);
     let config: DartConfig = DartConfig::try_load(module.config);
 
     let is_dart_project = context

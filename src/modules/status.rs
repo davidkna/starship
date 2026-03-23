@@ -18,8 +18,8 @@ enum PipeStatusStatus<'a> {
 /// Creates a module with the status of the last command
 ///
 /// Will display the status
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("status");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("status", instance_name);
     let config = StatusConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

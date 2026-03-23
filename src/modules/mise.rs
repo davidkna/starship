@@ -4,8 +4,8 @@ use crate::configs::mise::MiseConfig;
 use crate::formatter::StringFormatter;
 
 /// Creates a module with the current mise config
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("mise");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("mise", instance_name);
     let config = MiseConfig::try_load(module.config);
 
     let mise_applies = !config.disabled

@@ -221,9 +221,10 @@ impl<'a> Context<'a> {
     }
 
     /// Create a new module
-    pub fn new_module(&self, name: &str) -> Module<'_> {
+    pub fn new_module(&self, module_name: &str, instance_name: Option<&str>) -> Module<'_> {
+        let name = instance_name.unwrap_or(module_name);
         let config = self.config.get_module_config(name);
-        let desc = modules::description(name);
+        let desc = modules::description(module_name);
 
         Module::new(name, desc, config)
     }

@@ -9,8 +9,8 @@ use regex::Regex;
 const HAXERC_VERSION_PATTERN: &str = "(?:[0-9a-zA-Z][-+0-9.a-zA-Z]+)";
 
 /// Creates a module with the current Haxe version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("haxe");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("haxe", instance_name);
     let config = HaxeConfig::try_load(module.config);
 
     let is_haxe_project = context

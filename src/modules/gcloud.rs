@@ -81,8 +81,8 @@ fn get_active_config(context: &Context, config_dir: &Path) -> Option<String> {
     })
 }
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("gcloud");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("gcloud", instance_name);
     let config: GcloudConfig = GcloudConfig::try_load(module.config);
 
     if !(context.detect_env_vars(&config.detect_env_vars)) {

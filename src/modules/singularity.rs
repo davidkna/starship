@@ -6,10 +6,10 @@ use crate::formatter::StringFormatter;
 /// Creates a module with the current Singularity image
 ///
 /// Will display the Singularity image if `$SINGULARITY_NAME` is set.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     let singularity_env = context.get_env("SINGULARITY_NAME")?;
 
-    let mut module = context.new_module("singularity");
+    let mut module = context.new_module("singularity", instance_name);
     let config: SingularityConfig = SingularityConfig::try_load(module.config);
 
     let parsed = StringFormatter::new(config.format).and_then(|formatter| {

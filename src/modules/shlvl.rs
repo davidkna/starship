@@ -8,13 +8,13 @@ use std::convert::TryInto;
 
 const SHLVL_ENV_VAR: &str = "SHLVL";
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     let props = &context.properties;
     let shlvl = props
         .shlvl
         .or_else(|| context.get_env(SHLVL_ENV_VAR)?.parse::<i64>().ok())?;
 
-    let mut module = context.new_module("shlvl");
+    let mut module = context.new_module("shlvl", instance_name);
     let config: ShLvlConfig = ShLvlConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

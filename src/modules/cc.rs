@@ -109,12 +109,16 @@ fn create_module<'a, T>(
     Some(module)
 }
 
-pub fn module<'a>(context: &'a Context, lang: Lang) -> Option<Module<'a>> {
+pub fn module<'a>(
+    context: &'a Context,
+    lang: Lang,
+    instance_name: Option<&str>,
+) -> Option<Module<'a>> {
     match lang {
         Lang::C => {
             let lang = "c";
             let compilers = [("clang", "clang"), ("gcc", "Free Software Foundation")];
-            let module = context.new_module(lang);
+            let module = context.new_module(lang, instance_name);
             let config = CConfig::try_load(module.config);
 
             create_module::<CConfigMarker>(context, lang, compilers, module, config)
@@ -122,7 +126,7 @@ pub fn module<'a>(context: &'a Context, lang: Lang) -> Option<Module<'a>> {
         Lang::Cpp => {
             let lang = "cpp";
             let compilers = [("clang++", "clang"), ("g++", "Free Software Foundation")];
-            let module = context.new_module(lang);
+            let module = context.new_module(lang, instance_name);
             let config = CppConfig::try_load(module.config);
 
             create_module::<CppConfigMarker>(context, lang, compilers, module, config)

@@ -3,8 +3,8 @@ use crate::configs::buf::BufConfig;
 use crate::formatter::StringFormatter;
 use crate::formatter::VersionFormatter;
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("buf");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("buf", instance_name);
     let config: BufConfig = BufConfig::try_load(module.config);
 
     let is_buf_project = context

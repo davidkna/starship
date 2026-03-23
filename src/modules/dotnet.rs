@@ -17,8 +17,8 @@ const GLOBAL_JSON_FILE: &str = "global.json";
 const PROJECT_JSON_FILE: &str = "project.json";
 
 /// A module which shows the latest (or pinned) version of the dotnet SDK
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("dotnet");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("dotnet", instance_name);
     let config = DotnetConfig::try_load(module.config);
 
     // First check if this is a DotNet Project before doing the O(n)

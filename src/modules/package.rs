@@ -14,8 +14,8 @@ use std::io::Read;
 use versions::Version;
 
 /// Creates a module with the current package version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("package");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("package", instance_name);
     let config: PackageConfig = PackageConfig::try_load(module.config);
     let module_version = get_version(context, &config)?;
 

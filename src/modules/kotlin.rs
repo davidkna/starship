@@ -9,8 +9,8 @@ use regex::Regex;
 const KOTLIN_VERSION_PATTERN: &str = "(?P<version>[\\d\\.]+[\\d\\.]+[\\d\\.]+)";
 
 /// Creates a module with the current Kotlin version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("kotlin");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("kotlin", instance_name);
     let config = KotlinConfig::try_load(module.config);
 
     let is_kotlin_project = context

@@ -12,8 +12,8 @@ use whoami::hostname;
 ///     - `hostname.disabled` is absent or false
 ///     - `hostname.ssh_only` is false OR the user is currently connected as an SSH session (`$SSH_CONNECTION`)
 ///     - `hostname.ssh_only` is false AND `hostname.detect_env_vars` is either empty or contains a defined environment variable
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("hostname");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("hostname", instance_name);
     let config: HostnameConfig = HostnameConfig::try_load(module.config);
 
     let ssh_connection = context.get_env("SSH_CONNECTION");

@@ -7,13 +7,13 @@ use crate::formatter::StringFormatter;
 /// Creates a module with the current Spack environment
 ///
 /// Will display the Spack environment if `$SPACK_ENV` is set.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     let spack_env = context.get_env("SPACK_ENV").unwrap_or_default();
     if spack_env.trim().is_empty() {
         return None;
     }
 
-    let mut module = context.new_module("spack");
+    let mut module = context.new_module("spack", instance_name);
     let config: SpackConfig = SpackConfig::try_load(module.config);
 
     let spack_env = truncate(&spack_env, config.truncation_length).unwrap_or(spack_env);

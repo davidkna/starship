@@ -7,14 +7,14 @@ use crate::formatter::StringFormatter;
 /// Creates a module with the current Meson dev environment
 ///
 /// Will display the Meson environment if `$MESON_DEVENV` and `MESON_PROJECT_NAME` are set.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     let meson_env = context.get_env("MESON_DEVENV")?;
     let project_env = context.get_env("MESON_PROJECT_NAME")?;
     if meson_env != "1" || project_env.trim().is_empty() {
         return None;
     }
 
-    let mut module = context.new_module("meson");
+    let mut module = context.new_module("meson", instance_name);
     let config: MesonConfig = MesonConfig::try_load(module.config);
 
     let truncated_text = truncate_text(

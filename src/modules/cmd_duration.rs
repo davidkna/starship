@@ -8,8 +8,8 @@ use crate::utils::render_time;
 ///
 /// Will only print if last command took more than a certain amount of time to
 /// execute. Default is two seconds, but can be set by config option `min_time`.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("cmd_duration");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("cmd_duration", instance_name);
     let config: CmdDurationConfig = CmdDurationConfig::try_load(module.config);
 
     if config.min_time < 0 {

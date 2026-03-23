@@ -27,8 +27,8 @@ struct Account {
 }
 
 /// Creates a module with the current Pulumi version and stack name.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("pulumi");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("pulumi", instance_name);
     let config = PulumiConfig::try_load(module.config);
 
     let project_file_in_cwd = context

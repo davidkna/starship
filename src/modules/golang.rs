@@ -11,8 +11,8 @@ use std::ops::Deref;
 use std::sync::LazyLock;
 
 /// Creates a module with the current Go version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("golang");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("golang", instance_name);
     let config = GoConfig::try_load(module.config);
     let is_go_project = context
         .try_begin_scan()?

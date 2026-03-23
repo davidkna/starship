@@ -46,8 +46,8 @@ fn get_osp_cloud_and_project(context: &Context) -> (Option<Cloud>, Option<Projec
     }
 }
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("openstack");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("openstack", instance_name);
     let config: OspConfig = OspConfig::try_load(module.config);
 
     let (osp_cloud, osp_project) = get_osp_cloud_and_project(context);

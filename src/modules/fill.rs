@@ -6,8 +6,8 @@ use crate::segment::Segment;
 
 /// Creates a module that fills the any extra space on the line.
 ///
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("fill");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("fill", instance_name);
     let config: FillConfig = FillConfig::try_load(module.config);
 
     if config.disabled {

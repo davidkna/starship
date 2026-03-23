@@ -6,8 +6,8 @@ use crate::configs::sudo::SudoConfig;
 use crate::formatter::StringFormatter;
 
 /// Creates a module with sudo credential cache status
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("sudo");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("sudo", instance_name);
     let config = SudoConfig::try_load(module.config);
 
     if config.disabled {

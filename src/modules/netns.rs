@@ -1,12 +1,12 @@
 use super::{Context, Module};
 
 #[cfg(not(target_os = "linux"))]
-pub fn module<'a>(_context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(_context: &'a Context, _instance_name: Option<&str>) -> Option<Module<'a>> {
     None
 }
 
 #[cfg(target_os = "linux")]
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
     use crate::{config::ModuleConfig, configs::netns::NetnsConfig, formatter::StringFormatter};
 
     fn netns_name(context: &Context) -> Option<String> {
@@ -16,7 +16,7 @@ pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
             .filter(|name| !name.is_empty())
     }
 
-    let mut module = context.new_module("netns");
+    let mut module = context.new_module("netns", instance_name);
     let config = NetnsConfig::try_load(module.config);
 
     if config.disabled {

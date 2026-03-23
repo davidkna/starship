@@ -28,8 +28,8 @@ struct Subscription {
     is_default: bool,
 }
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("azure");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("azure", instance_name);
     let config = AzureConfig::try_load(module.config);
 
     if config.disabled {

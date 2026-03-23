@@ -8,8 +8,8 @@ use crate::utils::get_command_string_output;
 ///
 /// Will display the Pixi environment iff `$PIXI_ENVIRONMENT_NAME` is set.
 /// Will display the Pixi version iff pixi files are detected or `$PIXI_ENVIRONMENT_NAME` is set.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("pixi");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("pixi", instance_name);
     let config: PixiConfig = PixiConfig::try_load(module.config);
 
     let pixi_environment_name = context.get_env("PIXI_ENVIRONMENT_NAME");

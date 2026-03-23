@@ -9,8 +9,8 @@ use std::io;
 use std::path::PathBuf;
 
 /// Creates a module with the current Terraform version and workspace
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("terraform");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("terraform", instance_name);
     let config: TerraformConfig = TerraformConfig::try_load(module.config);
 
     let is_terraform_project = context

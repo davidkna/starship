@@ -11,8 +11,8 @@ use crate::modules::git_status::uses_reftables;
 /// Creates a module with the Git branch in the current directory
 ///
 /// Will display the branch name if the current directory is a git repo
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("git_branch");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("git_branch", instance_name);
     let config = GitBranchConfig::try_load(module.config);
 
     let truncation_symbol = get_first_grapheme(config.truncation_symbol);

@@ -5,8 +5,8 @@ use crate::configs::rlang::RLangConfig;
 use crate::formatter::StringFormatter;
 use crate::utils::get_command_string_output;
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("rlang");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("rlang", instance_name);
     let config: RLangConfig = RLangConfig::try_load(module.config);
 
     let is_r_project = context

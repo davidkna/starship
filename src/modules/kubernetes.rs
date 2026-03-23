@@ -132,8 +132,8 @@ impl DataValue for Yaml {
     }
 }
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("kubernetes");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("kubernetes", instance_name);
     let config: KubernetesConfig = KubernetesConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

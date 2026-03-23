@@ -5,8 +5,8 @@ use crate::configs::time::TimeConfig;
 use crate::formatter::StringFormatter;
 
 /// Outputs the current time
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("time");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("time", instance_name);
     let config: TimeConfig = TimeConfig::try_load(module.config);
 
     // As we default to disabled=true, we have to check here after loading our config module,

@@ -4,8 +4,8 @@ use crate::configs::v::VConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 
 /// Creates a module with the current V version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("vlang");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("vlang", instance_name);
     let config = VConfig::try_load(module.config);
     let is_v_project = context
         .try_begin_scan()?

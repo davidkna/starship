@@ -9,8 +9,8 @@ const JAVA_VERSION_PATTERN: &str =
     "(?:JRE.*\\(|OpenJ9 )(?P<version>\\d+(?:\\.\\d+){0,2}).*, built on";
 
 /// Creates a module with the current Java version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("java");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("java", instance_name);
     let config: JavaConfig = JavaConfig::try_load(module.config);
 
     let is_java_project = context

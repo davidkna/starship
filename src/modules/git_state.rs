@@ -10,8 +10,8 @@ use crate::formatter::StringFormatter;
 ///
 /// During a git operation it will show: REBASING, BISECTING, MERGING, etc.
 /// If the progress information is available (e.g. rebasing 3/10), it will show that too.
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("git_state");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("git_state", instance_name);
     let config: GitStateConfig = GitStateConfig::try_load(module.config);
 
     let repo = context.get_repo().ok()?;

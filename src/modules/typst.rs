@@ -4,8 +4,8 @@ use crate::configs::typst::TypstConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 
 /// Creates a module with the current Typst version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("typst");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("typst", instance_name);
     let config = TypstConfig::try_load(module.config);
 
     let is_typst_project = context

@@ -8,8 +8,8 @@ use crate::formatter::StringFormatter;
 /// Creates a module with the Git commit in the current directory
 ///
 /// Will display the commit hash if the current directory is a git repo
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("git_commit");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("git_commit", instance_name);
     let config: GitCommitConfig = GitCommitConfig::try_load(module.config);
 
     let repo = context.get_repo().ok()?;

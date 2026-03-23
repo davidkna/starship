@@ -4,8 +4,8 @@ use crate::configs::solidity::SolidityConfig;
 use crate::formatter::{StringFormatter, VersionFormatter};
 use crate::utils::get_command_string_output;
 
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("solidity");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("solidity", instance_name);
     let config = SolidityConfig::try_load(module.config);
 
     let is_solidity_project = context

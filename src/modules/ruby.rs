@@ -11,8 +11,8 @@ use crate::formatter::{StringFormatter, VersionFormatter};
 ///     - Current directory contains a `.rb` file
 ///     - Current directory contains a `Gemfile` or `.ruby-version` file
 ///     - The environment variables `RUBY_VERSION` or `RBENV_VERSION` are set
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("ruby");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("ruby", instance_name);
     let config = RubyConfig::try_load(module.config);
 
     let is_rb_project = context

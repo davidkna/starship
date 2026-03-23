@@ -7,8 +7,8 @@ const DAML_SDK_VERSION_ENV: &str = "DAML_SDK_VERSION";
 const DAML_YAML: &str = "daml.yaml";
 
 /// Creates a module with the current Daml version
-pub fn module<'a>(context: &'a Context) -> Option<Module<'a>> {
-    let mut module = context.new_module("daml");
+pub fn module<'a>(context: &'a Context, instance_name: Option<&str>) -> Option<Module<'a>> {
+    let mut module = context.new_module("daml", instance_name);
     let config: DamlConfig = DamlConfig::try_load(module.config);
 
     let is_daml_project = context
