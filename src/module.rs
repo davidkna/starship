@@ -256,8 +256,10 @@ where
 
         let wanted_len = fill_size.map(|s| s + fill_slack);
         prev_style = strs.last().map(|s| *s.style_ref());
-        let next_style = if let Some((s, _)) = chunk_iter.peek() {
-            s.first().map(|s| *s.style_ref())
+        let next_style = if let Some((s, next_fill)) = chunk_iter.peek() {
+            s.first()
+                .map(|s| *s.style_ref())
+                .or_else(|| next_fill.style())
         } else {
             // For the last fill there is no next chunk; the trailing text is in `current`.
             current.first().map(|s| *s.style_ref())
@@ -372,6 +374,34 @@ mod tests {
             Color::Red.paint("A"),
             Color::Blue.paint("...."),
             nu_ansi_term::Style::new().on(Color::Blue).paint("B"),
+        ])
+        .to_string();
+        assert_eq!(combined, expected);
+    }
+
+    #[test]
+    fn test_fill_segment_resolves_next_style_from_adjacent_fill() {
+        let mut module = Module::new("unit_test", "This is a unit test", None);
+        module.set_segments(vec![
+            Segment::from_text(parse_style_string("fg:red", None), "A")
+                .into_iter()
+                .next()
+                .unwrap(),
+            Segment::fill(parse_style_string("fg:next_bg", None), "."),
+            Segment::fill(parse_style_string("bg:blue", None), "-"),
+            Segment::from_text(parse_style_string("bg:green", None), "B")
+                .into_iter()
+                .next()
+                .unwrap(),
+        ]);
+
+        let rendered = module.ansi_strings_for_width(Some(7));
+        let combined = AnsiStrings(&rendered).to_string();
+        let expected = AnsiStrings(&[
+            Color::Red.paint("A"),
+            Color::Blue.paint("..."),
+            nu_ansi_term::Style::new().on(Color::Blue).paint("--"),
+            nu_ansi_term::Style::new().on(Color::Green).paint("B"),
         ])
         .to_string();
         assert_eq!(combined, expected);

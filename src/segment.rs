@@ -36,6 +36,10 @@ pub struct FillSegment {
 }
 
 impl FillSegment {
+    pub fn style(&self) -> Option<AnsiStyle> {
+        self.style.map(|style| style.to_ansi_style(None))
+    }
+
     // Returns the AnsiString of the segment value, not including its prefix and suffix
     pub fn ansi_string(
         &self,
@@ -108,7 +112,7 @@ impl FillSegment {
 #[cfg(test)]
 mod fill_seg_tests {
     use super::FillSegment;
-    use crate::config::{StyleRefs, parse_style_string};
+    use crate::config::{parse_style_string, StyleRefs};
     use nu_ansi_term::Style as AnsiStyle;
     use nu_ansi_term::{AnsiStrings, Color};
 
