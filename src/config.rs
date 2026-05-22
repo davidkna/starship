@@ -1080,6 +1080,30 @@ mod tests {
     }
 
     #[test]
+    fn table_get_styles_keep_fallback_when_ref_side_is_missing() {
+        let prev_style = AnsiStyle::new().fg(Color::Yellow).on(Color::Red);
+        let next_style = AnsiStyle::new().fg(Color::Blue).on(Color::Cyan);
+
+        let next_ref_with_fallback =
+            <StyleWrapper>::from_config(&Value::from("fg:black fg:next_bg bg:next_fg"))
+                .unwrap()
+                .0;
+        assert_eq!(
+            next_ref_with_fallback.to_ansi_style(Some(StyleRefs::new(Some(prev_style), None))),
+            AnsiStyle::new().fg(Color::Black)
+        );
+
+        let prev_ref_with_fallback =
+            <StyleWrapper>::from_config(&Value::from("fg:black fg:prev_bg bg:prev_fg"))
+                .unwrap()
+                .0;
+        assert_eq!(
+            prev_ref_with_fallback.to_ansi_style(Some(StyleRefs::new(None, Some(next_style)))),
+            AnsiStyle::new().fg(Color::Black)
+        );
+    }
+
+    #[test]
     fn table_get_styles_ordered() {
         // Test a background style with inverted order (also test hex + ANSI)
         let config = Value::from("bg:#050505 underline fg:120");
