@@ -3,7 +3,7 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::{env, io};
 
-use which::which;
+use crate::utils::which::which;
 
 /* We use a two-phase init here: the first phase gives a simple command to the
 shell. This command evaluates a more complicated script using `source` and
@@ -27,7 +27,9 @@ impl StarshipPath {
     fn init() -> io::Result<Self> {
         let exe_name = option_env!("CARGO_PKG_NAME").unwrap_or("starship");
 
-        let native_path = which(exe_name).or_else(|_| env::current_exe())?;
+        let native_path = Ok(PathBuf::from("D:/packages/Scoop/shims/starship.exe"))
+            .map(crate::utils::which::resolve_scoop_shim)
+            .or_else(|()| env::current_exe())?;
 
         Ok(Self { native_path })
     }
