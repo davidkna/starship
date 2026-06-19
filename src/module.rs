@@ -220,7 +220,10 @@ where
             }
             _ => {
                 used += segment.width_graphemes();
-                let next_style = segments.peek().and_then(|s| s.style());
+                let current_base_style = segment.style_with_prev(prev_style);
+                let next_style = segments
+                    .peek()
+                    .and_then(|s| s.style_with_prev(current_base_style));
 
                 let style_refs = StyleRefs::new(prev_style, next_style);
                 let current_segment_string = segment.ansi_string(Some(style_refs));
@@ -256,10 +259,11 @@ where
 
         let wanted_len = fill_size.map(|s| s + fill_slack);
         prev_style = strs.last().map(|s| *s.style_ref());
+        let fill_base_style = fill.style_with_refs(Some(StyleRefs::new(prev_style, None)));
         let next_style = if let Some((s, next_fill)) = chunk_iter.peek() {
             s.first()
                 .map(|s| *s.style_ref())
-                .or_else(|| next_fill.style())
+                .or_else(|| next_fill.style_with_refs(Some(StyleRefs::new(fill_base_style, None))))
         } else {
             // For the last fill there is no next chunk; the trailing text is in `current`.
             current.first().map(|s| *s.style_ref())
@@ -402,6 +406,33 @@ mod tests {
             Color::Blue.paint("..."),
             nu_ansi_term::Style::new().on(Color::Blue).paint("--"),
             nu_ansi_term::Style::new().on(Color::Green).paint("B"),
+        ])
+        .to_string();
+        assert_eq!(combined, expected);
+    }
+
+    #[test]
+    fn test_next_style_resolves_next_prev_style_refs() {
+        let mut module = Module::new("unit_test", "This is a unit test", None);
+        module.set_segments(vec![
+            Segment::from_text(parse_style_string("fg:blue bg:next_fg", None), ">")
+                .into_iter()
+                .next()
+                .unwrap(),
+            Segment::from_text(parse_style_string("fg:prev_fg", None), ")")
+                .into_iter()
+                .next()
+                .unwrap(),
+        ]);
+
+        let rendered = module.ansi_strings_for_width(None);
+        let combined = AnsiStrings(&rendered).to_string();
+        let expected = AnsiStrings(&[
+            nu_ansi_term::Style::new()
+                .fg(Color::Blue)
+                .on(Color::Blue)
+                .paint(">"),
+            Color::Blue.paint(")"),
         ])
         .to_string();
         assert_eq!(combined, expected);

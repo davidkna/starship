@@ -16,6 +16,10 @@ pub struct TextSegment {
 }
 
 impl TextSegment {
+    fn style(&self, style_refs: Option<StyleRefs>) -> Option<AnsiStyle> {
+        self.style.map(|style| style.to_ansi_style(style_refs))
+    }
+
     // Returns the AnsiString of the segment value
     fn ansi_string(&self, style_refs: Option<StyleRefs>) -> AnsiString<'_> {
         match self.style {
@@ -37,7 +41,11 @@ pub struct FillSegment {
 
 impl FillSegment {
     pub fn style(&self) -> Option<AnsiStyle> {
-        self.style.map(|style| style.to_ansi_style(None))
+        self.style_with_refs(None)
+    }
+
+    pub fn style_with_refs(&self, style_refs: Option<StyleRefs>) -> Option<AnsiStyle> {
+        self.style.map(|style| style.to_ansi_style(style_refs))
     }
 
     // Returns the AnsiString of the segment value, not including its prefix and suffix
@@ -305,9 +313,14 @@ impl Segment {
     }
 
     pub fn style(&self) -> Option<AnsiStyle> {
+        self.style_with_prev(None)
+    }
+
+    pub fn style_with_prev(&self, prev_style: Option<AnsiStyle>) -> Option<AnsiStyle> {
+        let style_refs = StyleRefs::new(prev_style, None);
         match self {
-            Self::Fill(fs) => fs.style.map(|cs| cs.to_ansi_style(None)),
-            Self::Text(ts) => ts.style.map(|cs| cs.to_ansi_style(None)),
+            Self::Fill(fs) => fs.style_with_refs(Some(style_refs)),
+            Self::Text(ts) => ts.style(Some(style_refs)),
             Self::LineTerm => None,
         }
     }
