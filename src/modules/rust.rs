@@ -92,35 +92,24 @@ impl RustToolingEnvironmentInfo {
     /// specified by `self.get_env_toolchain_override()`
     fn get_rustup_rustc_version(&self, context: &Context) -> &RustupRunRustcVersionOutcome {
         self.rustup_rustc_output.get_or_init(|| {
+            // Skip the whole rustup path when `rustc` in PATH is not managed by
+            // rustup (system-managed rustc).
+            if !rustc_is_rustup_managed() {
+                log::debug!("rustc is not rustup-managed; skipping rustup version detection");
+                return RustupRunRustcVersionOutcome::RustupNotWorking;
+            }
+
             let out = if let Some(toolchain) = self.get_env_toolchain_override(context) {
-                // First try running ~/.rustup/toolchains/<toolchain>/bin/rustc --version
-                rustup_home()
-                    .map(|rustup_folder| {
-                        rustup_folder
-                            .join("toolchains")
-                            .join(toolchain)
-                            .join("bin")
-                            .join("rustc")
-                    })
-                    .and_then(|rustc| {
-                        log::trace!("Running rustc --version directly with {rustc:?}");
-                        create_command(rustc).map(|mut cmd| {
-                            cmd.arg("--version");
-                            cmd
-                        })
-                    })
-                    .or_else(|_| {
-                        // If that fails, try running rustup rustup run <toolchain> rustc --version
-                        // Depending on the source of the toolchain override, it might not have been a full toolchain name ("stable" or "nightly").
-                        log::trace!("Running rustup {toolchain} rustc --version");
-                        create_command("rustup").map(|mut cmd| {
-                            cmd.args(["run", toolchain, "rustc", "--version"]);
-                            cmd
-                        })
-                    })
-                    .and_then(|mut cmd| cmd.current_dir(&context.current_dir).output())
-                    .map(extract_toolchain_from_rustup_run_rustc_version)
-                    .unwrap_or(RustupRunRustcVersionOutcome::RustupNotWorking)
+                // Try reading the version from the toolchain's on-disk files
+                // first — no subprocess needed.
+                let host_triple = match self.get_rustup_settings(context).default_host_triple() {
+                    Some(triple) => Some(triple),
+                    None => guess_host_triple(),
+                };
+                find_toolchain_dir(toolchain, host_triple)
+                    .and_then(|dir| get_version_from_toolchain_dir(&dir))
+                    .map(RustupRunRustcVersionOutcome::RustcVersion)
+                    .unwrap_or_else(|| run_rustc_from_toolchain(toolchain, context))
             } else {
                 RustupRunRustcVersionOutcome::ToolchainUnknown
             };
@@ -215,8 +204,9 @@ fn get_module_version(
             format_rustc_version(rustc_version, config.version_format)
         }
         Outcome::RustupNotWorking | Outcome::ToolchainUnknown => {
-            // If `rustup` can't be executed, or there is no environmental toolchain, we can
-            // execute `rustc --version` without triggering a toolchain download
+            // If `rustc` is not managed by rustup, `rustup` can't be executed, or there
+            // is no environmental toolchain, we can execute `rustc --version` without
+            // triggering a toolchain download
             format_rustc_version(&execute_rustc_version(context)?, config.version_format)
         }
         Outcome::ToolchainNotInstalled(name) => Some(name.to_string()),
@@ -328,12 +318,26 @@ fn find_rust_toolchain_file(context: &Context) -> Option<String> {
         }
         .filter(|c| !c.trim().is_empty())
         .map(|c| c.trim().to_owned())
+        .filter(|c| {
+            // A toolchain name must either contain no path separators (e.g.
+            // "stable", "nightly", "1.34.0") or be an absolute path (a custom
+            // toolchain directory).  Relative paths are rejected because rustup
+            // itself does not accept them.
+            let p = Path::new(c.as_str());
+            let valid = p.components().count() <= 1 || p.is_absolute();
+            if !valid {
+                log::warn!(
+                    "Ignoring toolchain '{c}' from {path:?}: relative paths are not permitted"
+                );
+            }
+            valid
+        })
     }
 
     if context
         .dir_contents()
         .is_ok_and(|dir| dir.has_file("rust-toolchain"))
-        && let Some(toolchain) = read_channel(Path::new("rust-toolchain"), false)
+        && let Some(toolchain) = read_channel(&context.current_dir.join("rust-toolchain"), false)
     {
         return Some(toolchain);
     }
@@ -341,7 +345,8 @@ fn find_rust_toolchain_file(context: &Context) -> Option<String> {
     if context
         .dir_contents()
         .is_ok_and(|dir| dir.has_file("rust-toolchain.toml"))
-        && let Some(toolchain) = read_channel(Path::new("rust-toolchain.toml"), true)
+        && let Some(toolchain) =
+            read_channel(&context.current_dir.join("rust-toolchain.toml"), true)
     {
         return Some(toolchain);
     }
@@ -380,6 +385,172 @@ fn execute_rustc_version(context: &Context) -> Option<String> {
         .exec_cmd("rustc", &["--version"])
         .map(|o| o.stdout)
         .filter(|s| !s.is_empty())
+}
+
+/// Returns `true` when the `rustc` binary in PATH is managed by rustup —
+/// i.e. it lives either under `$CARGO_HOME/bin` (the rustup proxy shim) or
+/// directly inside a rustup toolchain directory.
+fn rustc_is_rustup_managed() -> bool {
+    let Ok(rustc_path) = which::which("rustc") else {
+        return false;
+    };
+    // Resolve symlinks: package managers may link the rustup proxies into a
+    // bin directory outside CARGO_HOME (e.g. Homebrew's rustup formula).
+    let rustc_path = rustc_path.canonicalize().unwrap_or(rustc_path);
+    let under_rustup = rustup_home()
+        .map(|h| rustc_path.starts_with(h.join("toolchains")))
+        .unwrap_or(false);
+    let under_cargo = home::cargo_home()
+        .map(|h| rustc_path.starts_with(h.join("bin")))
+        .unwrap_or(false);
+    // A rustup proxy `rustc` always sits next to a `rustup` binary. A distro
+    // rustc that happens to share a bin directory with a distro rustup is a
+    // false positive, but that only costs the (safe) rustup detection path,
+    // while a missed proxy risks triggering a toolchain download (#417).
+    let next_to_rustup = rustc_path.parent().is_some_and(|dir| {
+        dir.join(format!("rustup{}", std::env::consts::EXE_SUFFIX))
+            .is_file()
+    });
+    log::trace!(
+        "rustc at {rustc_path:?}: under_rustup={under_rustup}, under_cargo={under_cargo}, next_to_rustup={next_to_rustup}"
+    );
+    under_rustup || under_cargo || next_to_rustup
+}
+
+/// Falls back to running `rustc --version` directly from the toolchain directory,
+/// or via `rustup run <toolchain> rustc --version` if the toolchain directory is
+/// not found.
+fn run_rustc_from_toolchain(toolchain: &str, context: &Context) -> RustupRunRustcVersionOutcome {
+    rustup_home()
+        .map(|rustup_folder| {
+            rustup_folder
+                .join("toolchains")
+                .join(toolchain)
+                .join("bin")
+                .join("rustc")
+        })
+        .and_then(|rustc| {
+            log::trace!("Running rustc --version directly with {rustc:?}");
+            create_command(rustc).map(|mut cmd| {
+                cmd.arg("--version");
+                cmd
+            })
+        })
+        .or_else(|_| {
+            // Toolchain name may be short ("stable"/"nightly") rather than fully-qualified.
+            log::trace!("Running rustup {toolchain} rustc --version");
+            create_command("rustup").map(|mut cmd| {
+                cmd.args(["run", toolchain, "rustc", "--version"]);
+                cmd
+            })
+        })
+        .and_then(|mut cmd| cmd.current_dir(&context.current_dir).output())
+        .map(extract_toolchain_from_rustup_run_rustc_version)
+        .unwrap_or(RustupRunRustcVersionOutcome::RustupNotWorking)
+}
+
+/// Resolves a toolchain name to its directory under `~/.rustup/toolchains`.
+///
+/// The name may be fully qualified (`stable-aarch64-apple-darwin`) or a short
+/// channel name (`stable`); short names are completed with the default host
+/// triple, or failing that the first matching directory.
+///
+/// Path-based toolchains (custom toolchain directories) return `None`: they
+/// are not installed under `~/.rustup/toolchains` and their on-disk metadata
+/// may not match the actual compiler, so the caller should fall through to
+/// running rustc/rustup instead.
+fn find_toolchain_dir(toolchain: &str, host_triple: Option<&str>) -> Option<PathBuf> {
+    if Path::new(toolchain).components().count() > 1 {
+        return None;
+    }
+
+    let toolchains_dir = rustup_home().ok()?.join("toolchains");
+
+    let exact = toolchains_dir.join(toolchain);
+    if exact.is_dir() {
+        return Some(exact);
+    }
+
+    if let Some(triple) = host_triple {
+        let qualified = toolchains_dir.join(format!("{toolchain}-{triple}"));
+        if qualified.is_dir() {
+            return Some(qualified);
+        }
+    }
+
+    let prefix = format!("{toolchain}-");
+    fs::read_dir(&toolchains_dir)
+        .ok()?
+        .filter_map(|e| e.ok())
+        .find(|e| e.file_name().to_string_lossy().starts_with(&prefix))
+        .map(|e| e.path())
+}
+
+/// Reads the Rust version from an installed toolchain's on-disk files without
+/// spawning a subprocess: first from the `rustc(1)` man page header (a few KiB;
+/// recent toolchains embed the full version there), then from the channel
+/// manifest (`lib/rustlib/multirust-channel-manifest.toml`, around 1 MiB).
+/// Returns a string in `rustc --version` style, e.g.
+/// `"rustc 1.77.0 (aeda7d245 2024-03-13)"`.
+fn get_version_from_toolchain_dir(toolchain_dir: &Path) -> Option<String> {
+    let man_path = toolchain_dir
+        .join("share")
+        .join("man")
+        .join("man1")
+        .join("rustc.1");
+    if let Ok(man) = fs::read_to_string(man_path)
+        && let Some(version) = scan_man_page_rust_version(&man)
+    {
+        return Some(format!("rustc {version}"));
+    }
+
+    let manifest_path = toolchain_dir
+        .join("lib")
+        .join("rustlib")
+        .join("multirust-channel-manifest.toml");
+    let content = fs::read_to_string(manifest_path).ok()?;
+    let version = scan_manifest_rust_version(&content)?;
+    Some(format!("rustc {version}"))
+}
+
+/// Extracts the version from the `.TH` header of a toolchain's `rustc(1)` man
+/// page, e.g.
+/// `.TH RUSTC "1" "April 2019" "rustc 1.77.0 (aeda7d245 2024-03-13)" "User Commands"`.
+///
+/// Only the full verbose form (`<version> (<hash> <date>)`) is accepted; older
+/// toolchains shipped an `<INSERT VERSION HERE>` placeholder or a bare version
+/// without the hash — returns `None` for those so the caller falls through to
+/// the channel manifest.
+fn scan_man_page_rust_version(content: &str) -> Option<&str> {
+    let line = content.lines().find(|l| l.starts_with(".TH RUSTC"))?;
+    let rest = &line[line.find("\"rustc ")? + "\"rustc ".len()..];
+    let version = &rest[..rest.find('"')?];
+    (version.starts_with(|c: char| c.is_ascii_digit())
+        && version.contains(" (")
+        && version.ends_with(')'))
+    .then_some(version)
+}
+
+/// Extracts the `[pkg.rust]` version string from a channel manifest without
+/// parsing the full TOML.  Returns the bare version, e.g.
+/// `"1.77.0 (aeda7d245 2024-03-13)"`.
+fn scan_manifest_rust_version(content: &str) -> Option<&str> {
+    let mut in_pkg_rust = false;
+    for line in content.lines() {
+        if line == "[pkg.rust]" {
+            in_pkg_rust = true;
+            continue;
+        }
+        if in_pkg_rust {
+            if line.starts_with('[') {
+                return None; // left the section without finding version
+            }
+            if let Some(rest) = line.strip_prefix("version = \"") {
+                return rest.strip_suffix('"');
+            }
+        }
+    }
+    None
 }
 
 fn format_rustc_version(rustc_version: &str, version_format: &str) -> Option<String> {
@@ -948,6 +1119,136 @@ LLVM version: 9.0
             (NIGHTLY, Some("nightly")) => Some(("v1.42.0", "nightly")),
             ("", None) => None,
             ("", Some("stable")) => None,
+        );
+    }
+
+    #[test]
+    fn test_find_rust_toolchain_file_rejects_relative_paths() -> io::Result<()> {
+        let dir = tempfile::tempdir()?;
+
+        // Relative path with separator — must be rejected
+        fs::write(dir.path().join("rust-toolchain"), "../some-toolchain")?;
+        let context = Context::new_with_shell_and_path(
+            Default::default(),
+            Shell::Unknown,
+            Target::Main,
+            dir.path().into(),
+            dir.path().into(),
+            Env::default(),
+        );
+        assert_eq!(find_rust_toolchain_file(&context), None);
+
+        // Absolute path — must be accepted
+        fs::write(dir.path().join("rust-toolchain"), "/opt/my-toolchain")?;
+        assert_eq!(
+            find_rust_toolchain_file(&context),
+            Some("/opt/my-toolchain".to_owned()),
+        );
+
+        // Plain channel name (no separator) — must be accepted
+        fs::write(dir.path().join("rust-toolchain"), "stable")?;
+        assert_eq!(
+            find_rust_toolchain_file(&context),
+            Some("stable".to_owned()),
+        );
+
+        dir.close()
+    }
+
+    #[test]
+    fn test_scan_manifest_rust_version_stable() {
+        let manifest = r#"manifest-version = "2"
+date = "2026-03-26"
+
+[pkg.rust]
+version = "1.94.1 (e408947bf 2026-03-25)"
+target = {}
+"#;
+        assert_eq!(
+            scan_manifest_rust_version(manifest),
+            Some("1.94.1 (e408947bf 2026-03-25)"),
+            "should extract version from [pkg.rust] section",
+        );
+    }
+
+    #[test]
+    fn test_scan_manifest_rust_version_ignores_other_sections() {
+        let manifest = r#"[pkg.other]
+version = "0.0.1"
+
+[pkg.rust]
+version = "1.94.1 (e408947bf 2026-03-25)"
+"#;
+        assert_eq!(
+            scan_manifest_rust_version(manifest),
+            Some("1.94.1 (e408947bf 2026-03-25)"),
+            "should not match version = in sections before [pkg.rust]",
+        );
+    }
+
+    #[test]
+    fn test_scan_manifest_rust_version_missing_section() {
+        let manifest = "[pkg.other]\nversion = \"1.0\"\n";
+        assert_eq!(
+            scan_manifest_rust_version(manifest),
+            None,
+            "should return None when [pkg.rust] section is absent",
+        );
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn test_find_toolchain_dir_rejects_path_based_toolchains() {
+        assert_eq!(find_toolchain_dir("/opt/my-toolchain", None), None);
+        assert_eq!(find_toolchain_dir("../my-toolchain", None), None);
+    }
+
+    #[test]
+    fn test_scan_man_page_rust_version() {
+        let man = r#".TH RUSTC "1" "April 2019" "rustc 1.97.0-beta.6 (b2282dd56 2026-07-01)" "User Commands"
+.SH NAME
+rustc \- The Rust compiler
+"#;
+        assert_eq!(
+            scan_man_page_rust_version(man),
+            Some("1.97.0-beta.6 (b2282dd56 2026-07-01)"),
+            "should extract the version from the .TH header",
+        );
+    }
+
+    #[test]
+    fn test_scan_man_page_rust_version_placeholder() {
+        let man = r#".TH RUSTC "1" "April 2019" "rustc <INSERT VERSION HERE>" "User Commands"
+.SH NAME
+rustc \- The Rust compiler
+"#;
+        assert_eq!(
+            scan_man_page_rust_version(man),
+            None,
+            "should reject the placeholder shipped by older toolchains",
+        );
+    }
+
+    #[test]
+    fn test_scan_man_page_rust_version_bare_version() {
+        let man = r#".TH RUSTC "1" "April 2019" "rustc 1.20.0" "User Commands"
+.SH NAME
+rustc \- The Rust compiler
+"#;
+        assert_eq!(
+            scan_man_page_rust_version(man),
+            None,
+            "should reject a bare version without hash and date",
+        );
+    }
+
+    #[test]
+    fn test_scan_manifest_rust_version_missing_version_key() {
+        let manifest = "[pkg.rust]\ntarget = {}\n";
+        assert_eq!(
+            scan_manifest_rust_version(manifest),
+            None,
+            "should return None when [pkg.rust] has no version key",
         );
     }
 }
