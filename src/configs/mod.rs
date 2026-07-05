@@ -17,6 +17,7 @@ pub mod container;
 pub mod cpp;
 pub mod crystal;
 pub mod custom;
+pub mod custom_wasm;
 pub mod daml;
 pub mod dart;
 pub mod deno;
@@ -147,6 +148,8 @@ pub struct FullConfig<'a> {
     conda: conda::CondaConfig<'a>,
     #[serde(borrow)]
     container: container::ContainerConfig<'a>,
+    #[serde(borrow)]
+    custom_wasm: custom_wasm::CustomWasmConfig<'a>,
     #[serde(borrow)]
     cpp: cpp::CppConfig<'a>,
     #[serde(borrow)]

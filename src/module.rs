@@ -22,6 +22,7 @@ pub const ALL_MODULES: &[&str] = &[
     "container",
     "cpp",
     "crystal",
+    "custom_wasm",
     "daml",
     "dart",
     "deno",

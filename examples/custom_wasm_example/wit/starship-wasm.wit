@@ -1,0 +1,19 @@
+package starship:wasm-interface@0.1.0;
+
+interface formatter {
+    /// Map a variable to its value (e.g., "output" -> computed value)
+    map: func(variable: string) -> result<option<string>, string>;
+
+    /// Map a meta variable (e.g., "symbol" -> icon)
+    map-meta: func(variable: string) -> result<option<string>, string>;
+
+    /// Map a style variable (e.g., "style" -> color/formatting)
+    map-style: func(variable: string) -> result<option<string>, string>;
+
+    /// Determine if module should be enabled
+    is-enabled: func() -> result<bool, string>;
+}
+
+world starship-module {
+    export formatter;
+}

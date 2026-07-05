@@ -88,7 +88,8 @@ yaml-rust2 = "0.11.0"
 guess_host_triple = "0.1.5"
 home = "0.5.12"
 shell-words = "1.1.1"
-wasmtime = { version = "34.0.2", features = ["component-model"], default-features = false }
+wasmtime = { version = "40.0.1", features = ["component-model", "cranelift", "runtime", "std", "parallel-compilation"], default-features = false }
+wasmtime-wasi = { version = "40.0.1", default-features = false, features = ["p2"] }
 
 [dependencies.schemars]
 version = "1.2.0"

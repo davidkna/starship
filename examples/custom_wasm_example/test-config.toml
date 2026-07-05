@@ -1,0 +1,9 @@
+# Test configuration for custom_wasm module
+format = "$custom_wasm$character"
+
+[custom_wasm]
+disabled = false
+wasm_path = "examples/custom_wasm_example/target/wasm32-wasip1/release/custom_wasm_example.wasm"
+format = "[$symbol$output]($style) "
+symbol = "🦀 "
+style = "bold cyan"

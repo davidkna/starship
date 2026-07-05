@@ -251,6 +251,24 @@
         "disabled": false
       }
     },
+    "custom_wasm": {
+      "$ref": "#/$defs/CustomWasmConfig",
+      "default": {
+        "format": "[$symbol$output]($style) ",
+        "symbol": "🧩 ",
+        "wasm_path": "",
+        "style": "bold blue",
+        "disabled": false,
+        "detect_files": [],
+        "detect_extensions": [],
+        "detect_folders": [],
+        "when": false,
+        "require_repo": false,
+        "shell": [],
+        "ignore_timeout": false,
+        "description": "Custom WASM module"
+      }
+    },
     "cpp": {
       "$ref": "#/$defs/CcConfig",
       "default": {
@@ -1758,24 +1776,20 @@
       }
     },
     "vcs": {
+      "$ref": "#/$defs/VcsConfig",
       "default": {
-        "disabled": false,
-        "fossil_modules": "$fossil_branch$fossil_metrics",
-        "git_modules": "$git_branch$git_commit$git_state$git_metrics$git_status",
-        "hg_modules": "$hg_branch$hg_state",
         "order": [
           "git",
           "hg",
           "pijul",
           "fossil"
         ],
+        "disabled": false,
+        "fossil_modules": "$fossil_branch$fossil_metrics",
+        "git_modules": "$git_branch$git_commit$git_state$git_metrics$git_status",
+        "hg_modules": "$hg_branch$hg_state",
         "pijul_modules": "$pijul_channel"
-      },
-      "allOf": [
-        {
-          "$ref": "#/definitions/VcsConfig"
-        }
-      ]
+      }
     },
     "vcsh": {
       "$ref": "#/$defs/VcshConfig",
@@ -2426,6 +2440,108 @@
         }
       },
       "additionalProperties": false
+    },
+    "CustomWasmConfig": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "default": "[$symbol$output]($style) "
+        },
+        "symbol": {
+          "type": "string",
+          "default": "🧩 "
+        },
+        "wasm_path": {
+          "type": "string",
+          "default": ""
+        },
+        "style": {
+          "type": "string",
+          "default": "bold blue"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "detect_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "detect_extensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "detect_folders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "when": {
+          "$ref": "#/$defs/Either",
+          "default": false
+        },
+        "require_repo": {
+          "type": "boolean",
+          "default": false
+        },
+        "shell": {
+          "$ref": "#/$defs/Either2",
+          "default": []
+        },
+        "os": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "use_stdin": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ignore_timeout": {
+          "type": "boolean",
+          "default": false
+        },
+        "description": {
+          "type": "string",
+          "default": "Custom WASM module"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Either": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "Either2": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "CrystalConfig": {
       "type": "object",
@@ -5340,7 +5456,7 @@
       "type": "object",
       "properties": {
         "pixi_binary": {
-          "$ref": "#/$defs/Either",
+          "$ref": "#/$defs/Either2",
           "default": [
             "pixi"
           ]
@@ -5395,19 +5511,6 @@
         }
       },
       "additionalProperties": false
-    },
-    "Either": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      ]
     },
     "PulumiConfig": {
       "type": "object",
@@ -5504,7 +5607,7 @@
           "default": "pyenv "
         },
         "python_binary": {
-          "$ref": "#/$defs/Either",
+          "$ref": "#/$defs/Either2",
           "default": [
             [
               "python"
@@ -6114,7 +6217,7 @@
           "default": "S "
         },
         "compiler": {
-          "$ref": "#/$defs/Either",
+          "$ref": "#/$defs/Either2",
           "default": [
             "solc"
           ]
@@ -6582,54 +6685,45 @@
       "type": "object",
       "properties": {
         "order": {
-          "description": "Order in which to discover VCSes. The first one found is the one used.",
+          "description": "Order in which to discover VCSes.\nThe first one found is the one used.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "default": [
             "git",
             "hg",
             "pijul",
             "fossil"
-          ],
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Vcs"
-          }
+          ]
         },
         "disabled": {
           "description": "Disables the VCS module.",
-          "default": false,
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         },
         "fossil_modules": {
           "description": "Modules to use when Fossil is matched.\n\nThey are configured separately at the top level.",
-          "default": "$fossil_branch$fossil_metrics",
-          "type": "string"
+          "type": "string",
+          "default": "$fossil_branch$fossil_metrics"
         },
         "git_modules": {
           "description": "Modules to use when Git is matched.\n\nThey are configured separately at the top level.",
-          "default": "$git_branch$git_commit$git_state$git_metrics$git_status",
-          "type": "string"
+          "type": "string",
+          "default": "$git_branch$git_commit$git_state$git_metrics$git_status"
         },
         "hg_modules": {
           "description": "Modules to use when Mercurial is matched.\n\nThey are configured separately at the top level.",
-          "default": "$hg_branch$hg_state",
-          "type": "string"
+          "type": "string",
+          "default": "$hg_branch$hg_state"
         },
         "pijul_modules": {
           "description": "Modules to use when Pijul is matched.\n\nThey are configured separately at the top level.",
-          "default": "$pijul_channel",
-          "type": "string"
+          "type": "string",
+          "default": "$pijul_channel"
         }
       },
       "additionalProperties": false
-    },
-    "Vcs": {
-      "type": "string",
-      "enum": [
-        "fossil",
-        "git",
-        "hg",
-        "pijul"
-      ]
     },
     "VcshConfig": {
       "type": "object",
@@ -6820,7 +6914,7 @@
           "default": ""
         },
         "when": {
-          "$ref": "#/$defs/Either2",
+          "$ref": "#/$defs/Either",
           "default": false
         },
         "require_repo": {
@@ -6828,7 +6922,7 @@
           "default": false
         },
         "shell": {
-          "$ref": "#/$defs/Either",
+          "$ref": "#/$defs/Either2",
           "default": []
         },
         "description": {
@@ -6886,16 +6980,6 @@
         }
       },
       "additionalProperties": false
-    },
-    "Either2": {
-      "anyOf": [
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "string"
-        }
-      ]
     }
   }
 }
