@@ -275,6 +275,7 @@ $fossil_branch\
 $fossil_metrics\
 $git_branch\
 $git_commit\
+$git_tag\
 $git_state\
 $git_metrics\
 $git_status\
@@ -1947,19 +1948,20 @@ ignore_remotes = ['origin', 'upstream']
 
 ## Git Commit
 
-The `git_commit` module shows the current commit hash and also the tag (if any) of the repo in your current directory.
+> [!WARNING]
+> Since starship v2 `$tag` is no longer included in the `git_commit` module.
+> Please use the `git_tag` module instead.
+
+The `git_commit` module shows the current commit hash of the repo in your current directory.
 
 ### Options
 
 | Option               | Default                      | Description                                                                          |
 | -------------------- | ---------------------------- | ------------------------------------------------------------------------------------ |
 | `commit_hash_length` | `7`                          | The length of the displayed git commit hash.                                         |
-| `format`             | `'[\($hash$tag\)]($style) '` | The format for the module.                                                           |
+| `format`             | `'[\($hash\)]($style) '` | The format for the module.                                                           |
 | `style`              | `'bold green'`               | The style for the module.                                                            |
 | `only_detached`      | `true`                       | Only show git commit hash when in detached `HEAD` state                              |
-| `tag_disabled`       | `true`                       | Disables showing tag info in `git_commit` module.                                    |
-| `tag_max_candidates` | `0`                          | How many commits to consider for tag display. The default only allows exact matches. |
-| `tag_symbol`         | `' 🏷  '`                     | Tag symbol prefixing the info shown                                                  |
 | `disabled`           | `false`                      | Disables the `git_commit` module.                                                    |
 
 ### Variables
@@ -1967,7 +1969,6 @@ The `git_commit` module shows the current commit hash and also the tag (if any) 
 | Variable | Example   | Description                                  |
 | -------- | --------- | -------------------------------------------- |
 | hash     | `b703eb3` | The current git commit hash                  |
-| tag      | `v1.0.0`  | The tag name if showing tag info is enabled. |
 | style\*  |           | Mirrors the value of option `style`          |
 
 *: This variable can only be used as a part of a style string
@@ -1979,8 +1980,47 @@ The `git_commit` module shows the current commit hash and also the tag (if any) 
 
 [git_commit]
 commit_hash_length = 4
-tag_symbol = '🔖 '
 ```
+
+## Git Tag
+
+The `git_tag` module shows the tag of the repo in your current directory, on branches and detached HEADs.
+It is disabled by default. By default, only tags pointing at the current commit are shown.
+
+### Options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `format` | `'[$symbol$tag]($style) '` | The format for the module. |
+| `style` | `'bold green'` | The style for the module. |
+| `symbol` | `'🏷  '` | The symbol displayed before the tag. |
+| `max_candidates` | `0` | How many candidate tags to consider. Zero only allows exact matches; a positive value also allows tags on ancestors along the first-parent history. |
+| `only_detached` | `false` | Only show the tag when in detached `HEAD` state. |
+| `disabled` | `true` | Disables the `git_tag` module. |
+
+### Variables
+
+| Variable | Example | Description |
+| --- | --- | --- |
+| tag | `v1.0.0` | The tag name. |
+| symbol | | Mirrors the value of option `symbol`. |
+| style\* | | Mirrors the value of option `style`. |
+
+*: This variable can only be used as a part of a style string
+
+### Example
+
+```toml
+# ~/.config/starship.toml
+
+[git_tag]
+disabled = false
+symbol = '🔖 '
+```
+
+To migrate from tag display in `git_commit`, remove `$tag` from its format and add `$git_tag` to any custom prompt format.
+Move `tag_symbol` and `tag_max_candidates` from `[git_commit]` to `symbol` and `max_candidates` in `[git_tag]`, and replace `tag_disabled = false` with `disabled = false`.
+The `git_commit.only_detached` option only controls the commit hash. Set `git_tag.only_detached = true` to restrict tags to detached HEADs as well.
 
 ## Git State
 
@@ -5253,7 +5293,7 @@ The module will be shown only if a configured VCS is currently in use.
 | ---------------- | ----------------------------------------------------------- | ----------------------------------------------------- |
 | `order`          | `["git", "hg", "pijul", "fossil"]`                          | The order in which to search VCSes.                   |
 | `fossil_modules` | `"$fossil_branch$fossil_metrics"`                           | Modules to show when a Fossil repository is found.    |
-| `git_modules`    | `"$git_branch$git_commit$git_state$git_metrics$git_status"` | Modules to show when a Git repository is found.       |
+| `git_modules`    | `"$git_branch$git_commit$git_tag$git_state$git_metrics$git_status"` | Modules to show when a Git repository is found.       |
 | `hg_modules`     | `"$hg_branch$hg_state"`                                     | Modules to show when a Mercurial repository is found. |
 | `pijul_modules`  | `"$pijul_channel"`                                          | Modules to show when a Pijul repository is found.     |
 | `disabled`       | `false`                                                     | Disables the `vcs` module.                            |

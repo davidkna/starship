@@ -702,13 +702,10 @@
       "$ref": "#/$defs/GitCommitConfig",
       "default": {
         "commit_hash_length": 7,
-        "format": "[\\($hash$tag\\)]($style) ",
+        "format": "[\\($hash\\)]($style) ",
         "style": "green bold",
         "only_detached": true,
-        "disabled": false,
-        "tag_symbol": " 🏷  ",
-        "tag_disabled": true,
-        "tag_max_candidates": 0
+        "disabled": false
       }
     },
     "git_metrics": {
@@ -765,6 +762,17 @@
         "ignore_submodules": false,
         "disabled": false,
         "use_git_executable": false
+      }
+    },
+    "git_tag": {
+      "$ref": "#/$defs/GitTagConfig",
+      "default": {
+        "format": "[$symbol$tag]($style) ",
+        "style": "green bold",
+        "symbol": "🏷  ",
+        "disabled": true,
+        "only_detached": false,
+        "max_candidates": 0
       }
     },
     "gleam": {
@@ -1918,7 +1926,7 @@
         ],
         "disabled": false,
         "fossil_modules": "$fossil_branch$fossil_metrics",
-        "git_modules": "$git_branch$git_commit$git_state$git_metrics$git_status",
+        "git_modules": "$git_branch$git_commit$git_tag$git_state$git_metrics$git_status",
         "hg_modules": "$hg_branch$hg_state",
         "pijul_modules": "$pijul_channel"
       }
@@ -3757,7 +3765,7 @@
         },
         "format": {
           "type": "string",
-          "default": "[\\($hash$tag\\)]($style) "
+          "default": "[\\($hash\\)]($style) "
         },
         "style": {
           "type": "string",
@@ -3770,20 +3778,6 @@
         "disabled": {
           "type": "boolean",
           "default": false
-        },
-        "tag_symbol": {
-          "type": "string",
-          "default": " 🏷  "
-        },
-        "tag_disabled": {
-          "type": "boolean",
-          "default": true
-        },
-        "tag_max_candidates": {
-          "type": "integer",
-          "format": "uint",
-          "minimum": 0,
-          "default": 0
         }
       },
       "additionalProperties": false
@@ -3972,6 +3966,38 @@
             "string",
             "null"
           ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "GitTagConfig": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "default": "[$symbol$tag]($style) "
+        },
+        "style": {
+          "type": "string",
+          "default": "green bold"
+        },
+        "symbol": {
+          "type": "string",
+          "default": "🏷  "
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "only_detached": {
+          "type": "boolean",
+          "default": false
+        },
+        "max_candidates": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0,
+          "default": 0
         }
       },
       "additionalProperties": false
@@ -7239,7 +7265,7 @@
         "git_modules": {
           "description": "Modules to use when Git is matched.\n\nThey are configured separately at the top level.",
           "type": "string",
-          "default": "$git_branch$git_commit$git_state$git_metrics$git_status"
+          "default": "$git_branch$git_commit$git_tag$git_state$git_metrics$git_status"
         },
         "hg_modules": {
           "description": "Modules to use when Mercurial is matched.\n\nThey are configured separately at the top level.",
